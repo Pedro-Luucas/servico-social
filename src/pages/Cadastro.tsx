@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { User } from '../types';
+import { User, Endereco } from '../types';
+import AddressModal from '../components/EnderecoModal';
 import { useNavigate } from 'react-router-dom';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
   initialData?: User;
 }
+
+
+
 
 const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   const [formData, setFormData] = useState<User>(initialData || {
@@ -14,12 +18,21 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
     cpf: '',
     rg: '',
     data: '',
-    endereco: '',
     telefone: '',
     profissao: '',
     escolaridade: '',
-    responsavel: '',
+    endereco: undefined,
   });
+
+  const [showModal, setShowModal] = useState(false);
+  const [endereco, setEndereco] = useState<Endereco | null>(null);
+  
+  const handleEnderecoSubmit = (enderecoData: Endereco) => {
+    setEndereco(enderecoData);
+    setFormData({ ...formData, endereco: enderecoData });
+    setShowModal(false); // Fechar modal após adicionar o endereço
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,8 +44,8 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   };
 
   return (
+  <div>
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Organize the input fields in two columns using the grid system */}
       <input
         name="nome"
         placeholder="Nome"
@@ -63,13 +76,6 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
         className="border rounded p-2 w-full"
       />
       <input
-        name="endereco"
-        placeholder="Endereço"
-        value={formData.endereco}
-        onChange={handleChange}
-        className="border rounded p-2 w-full"
-      />
-      <input
         name="telefone"
         placeholder="Telefone"
         value={formData.telefone}
@@ -90,20 +96,32 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
-        name="responsavel"
-        placeholder="Responsável"
-        value={formData.responsavel}
-        onChange={handleChange}
-        className="border rounded p-2 w-full"
-      />
-      <button
-        type="submit"
-        className="col-span-2 bg-blue-500 text-white p-2 rounded w-full"
-      >
-        Submit
-      </button>
-    </form>
+        {/* Botão para abrir o modal de adicionar endereço */}
+        <button
+          type="button"
+          onClick={() => setShowModal(true)}
+          className="col-span-2 bg-green-500 text-white p-2 rounded w-full"
+        >
+          Adicionar Endereço
+        </button>
+
+        <button
+          type="submit"
+          className="col-span-2 bg-blue-500 text-white p-2 rounded w-full"
+        >
+          Submit
+        </button>
+      </form>
+
+      {/* Renderizar o modal quando showModal for true */}
+      {showModal && (
+        <AddressModal
+          onClose={() => setShowModal(false)}
+          onSave={handleEnderecoSubmit}
+          initialData={endereco}
+        />
+      )}
+    </div>
   );
 };
 

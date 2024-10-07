@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from './types';
-import UserForm from './pages/UserForm';
+import UserForm from './pages/Cadastro';
 import UserList from './components/UserList';
 import { v4 as uuidv4 } from 'uuid';
 
