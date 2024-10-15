@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Endereco } from '../types';
 import AddressModal from '../components/EnderecoModal';
 import { useNavigate } from 'react-router-dom';
+import { DatePicker, Input, Select, Button } from "antd";
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
@@ -11,7 +12,7 @@ interface UserFormProps {
 
 
 
-const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
+const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   const [formData, setFormData] = useState<User>(initialData || {
     id: '',
     nome: '',
@@ -36,6 +37,23 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(formData)
+  };
+
+  const handleDate = (date: Date) => {
+    if (date) {
+      console.log('Date: ', date);
+    } else {
+      console.log('Clear');
+    }
+  };
+
+  const handleEscolaridade = (escolaridade: string) => {
+    if (escolaridade) {
+      console.log('escolaridade: ', escolaridade);
+    } else {
+      console.log('Clear');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,55 +64,59 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   return (
   <div>
     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input
+      <Input
         name="nome"
         placeholder="Nome"
         value={formData.nome}
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
-        name="cpf"
-        placeholder="CPF"
+      <Input
+        name="telefone"
+        placeholder="Telefone"
         value={formData.cpf}
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
+      <Input
         name="rg"
         placeholder="RG"
         value={formData.rg}
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
+      <DatePicker
         name="data"
         placeholder="Data de nascimento"
         type = "date"
-        value={formData.data}
-        onChange={handleChange}
+        onChange={handleDate}
         className="border rounded p-2 w-full"
       />
-      <input
-        name="telefone"
-        placeholder="Telefone"
+      <Input
+        name="cpf"
+        placeholder="CPF"
         value={formData.telefone}
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
+      <Input
         name="profissao"
         placeholder="Profissão"
         value={formData.profissao}
         onChange={handleChange}
         className="border rounded p-2 w-full"
       />
-      <input
-        name="escolaridade"
+      <Select
         placeholder="Escolaridade"
-        value={formData.escolaridade}
-        onChange={handleChange}
-        className="border rounded p-2 w-full"
+        onChange={handleEscolaridade}
+        options={[
+          { value: 'Ensino fundamental incompleto', label: 'Ensino fundamental incompleto' },
+          { value: 'Ensino fundamental completo', label: 'Ensino fundamental completo' },
+          { value: 'Ensino medio incompleto', label: 'Ensino médio incompleto' },
+          { value: 'Ensino médio completo', label: 'Ensino médio completo' },
+          { value: 'Ensino superior incompleto', label: 'Ensino superior incompleto' },
+          { value: 'Ensino superior completo', label: 'Ensino superior completo' },
+      ]}
       />
         {/* Botão para abrir o modal de adicionar endereço */}
         <button
@@ -125,4 +147,4 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   );
 };
 
-export default UserForm;
+export default Cadastro;

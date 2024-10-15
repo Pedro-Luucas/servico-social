@@ -17,19 +17,10 @@ const App: React.FC = () => {
     }
   };
 
-  const handleEditUser = (user: User) => {
-    setEditingUser(user);
-  };
-
-  const handleDeleteUser = (id: string) => {
-    setUsers(users.filter((user) => user.id !== id));
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Serviço Social</h1>
       <UserForm onSubmit={handleAddUser} initialData={editingUser || undefined} />
-      <UserList users={users} onEdit={handleEditUser} onDelete={handleDeleteUser} />
     </div>
   );
 };
