@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
 import { Endereco } from '../types';
-import { DatePicker, Input, Select, Button } from "antd";
+import { Input, Button } from "antd";
 import { CloseOutlined } from '@ant-design/icons';
-import { withMask } from 'use-mask-input'
+import InputMask from 'react-input-mask';
 import axios from 'axios';
 
+const { TextArea } = Input;
 
 interface AddressModalProps {
   onClose: () => void;
@@ -14,61 +14,79 @@ interface AddressModalProps {
 }
 
 const AddressModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialData }) => {
-  const { register, handleSubmit, setValue, watch } = useForm<Endereco>({
-    defaultValues: {
-      CEP: '',
-      municipio: '',
-      bairro: '',
-      rua: '',
-      numero: 0,
-      referencia: '',
-    },
-  });
+  const [cep, setCep] = useState(initialData?.CEP || '');
+  const [municipio, setMunicipio] = useState(initialData?.municipio || '');
+  const [bairro, setBairro] = useState(initialData?.bairro || '');
+  const [rua, setRua] = useState(initialData?.rua || '');
+  const [numero, setNumero] = useState(initialData?.numero || 0);
+  const [referencia, setReferencia] = useState(initialData?.referencia || '');
 
+  // Função para tratar a mudança no CEP e buscar o endereço via API
+  const onCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cepStr = e.target.value;
+    const cepValue = cepStr.replace(/[^0-9]/g, "");
 
-  const onCloseCancelar = () => {
-    setValue('CEP', "");
-    setValue('municipio', "");
-    setValue('bairro', "");
-    setValue('rua', "");
-    setValue('numero', 0);
-    setValue('referencia', "");
-    onClose()
-  }
+    setCep(cepStr); // Atualiza o estado do campo CEP
 
-  const cep = watch("CEP")
-
-  useEffect(() => {
-    if (cep && cep.length === 8) {
-      axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-        .then((response) => {
+    if (cepValue.length === 8) { // Verifica se o CEP tem 8 dígitos
+      try {
+        const response = await axios.get(`https://viacep.com.br/ws/${cepValue}/json/`);
+        if (response.data && !response.data.erro) {
           const { logradouro, bairro, localidade } = response.data;
-          setValue("rua", logradouro);
-          setValue("bairro", bairro);
-          setValue("municipio", localidade);
-        })
-        .catch(() => {
-          alert("Erro ao buscar o CEP.");
-        });
-    }
-  }, [cep, setValue]);
 
-  // Preencher o formulário se initialData for fornecido
+          setRua(logradouro);
+          setBairro(bairro);
+          setMunicipio(localidade);
+        } else {
+          console.error('CEP inválido ou não encontrado.');
+          setRua('');
+          setBairro('');
+          setMunicipio('');
+        }
+      } catch (error) {
+        console.error("Erro ao buscar o CEP: ", error);
+        setRua('');
+        setBairro('');
+        setMunicipio('');
+      }
+    }
+  };
+
+  // Atualiza os valores iniciais caso initialData seja fornecido
   useEffect(() => {
     if (initialData) {
-      setValue('CEP', initialData.CEP);
-      setValue('municipio', initialData.municipio);
-      setValue('bairro', initialData.bairro);
-      setValue('rua', initialData.rua);
-      setValue('numero', initialData.numero);
-      setValue('referencia', initialData.referencia);
+      setCep(initialData.CEP || '');
+      setMunicipio(initialData.municipio || '');
+      setBairro(initialData.bairro || '');
+      setRua(initialData.rua || '');
+      setNumero(initialData.numero || 0);
+      setReferencia(initialData.referencia || '');
     }
-  }, [initialData, setValue]);
+  }, [initialData]);
 
   // Função para submeter o formulário
-  const onSubmit = (data: Endereco) => {
-    onSave(data);  // Chama a função de salvamento passando os dados do endereço
-    onClose();     // Fecha o modal após salvar
+  const handleSubmit = () => {
+    const enderecoFinal: Endereco = {
+      CEP: cep,
+      municipio,
+      bairro,
+      rua,
+      numero,
+      referencia,
+    };
+    onSave(enderecoFinal);  // Chama a função de salvamento passando os dados do endereço
+    onClose();              // Fecha o modal após salvar
+  };
+
+  const handleCancel = () => {
+    // Reseta os valores dos campos e fecha o modal
+    setCep('');
+    setMunicipio('');
+    setBairro('');
+    setRua('');
+    setNumero(0);
+    setReferencia('');
+    onClose();
   };
 
   return (
@@ -76,57 +94,63 @@ const AddressModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialDat
       <div className="bg-white p-6 rounded shadow-lg w-96">
         <div className="flex flex-row justify-between">
           <h2 className="text-xl mb-4">Adicionar Endereço</h2>
-          <Button type='text' icon={<CloseOutlined/>} onClick={onClose} className='self-start' />
+          <Button type='text' icon={<CloseOutlined />} onClick={onClose} className='self-start' />
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4">
-          <input
-            {...register("CEP")}
-            ref={withMask('00000-000')}
-            placeholder="CEP"
-            maxLength={8}
-            //nao da de usar use-mask-input no Input do antd entao ta ai essa gambiarra de de className
-            className="ant-input css-dev-only-do-not-override-1hpnbz2 ant-input-outlined border rounded p-2 w-full"
-            
-          />
-          <Input
-            {...register('municipio')}
-            placeholder="Município"
-            className="border rounded p-2 w-full"
-          />
-          <Input
-            {...register('bairro')}
-            placeholder="Bairro"
-            className="border rounded p-2 w-full"
-          />
-          <Input
-            {...register('rua')}
-            placeholder="Rua"
-            className="border rounded p-2 w-full"
-          />
-          
-          <Input
-            {...register('numero', { valueAsNumber: true})}
-            placeholder = "Número"
-            className="border rounded p-2 w-full" 
-          />
 
+        <form className="grid grid-cols-1 gap-4">
+          <InputMask
+            mask="99999-999"
+            value={cep}
+            onChange={onCepChange}
+            maskChar="_"
+            placeholder="CEP"
+            className="ant-input css-dev-only-do-not-override-1hpnbz2 ant-input-outlined border rounded p-4 w-full text-lg"
+          />
           <Input
-            {...register('referencia')}
+            value={municipio}
+            onChange={(e) => setMunicipio(e.target.value)}
+            placeholder="Município"
+            className="border rounded p-4 w-full text-lg"
+          />
+          <Input
+            value={bairro}
+            onChange={(e) => setBairro(e.target.value)}
+            placeholder="Bairro"
+            className="border rounded p-4 w-full text-lg"
+          />
+          <Input
+            value={rua}
+            onChange={(e) => setRua(e.target.value)}
+            placeholder="Rua"
+            className="border rounded p-4 w-full text-lg"
+          />
+          <Input
+            type="number"
+            value={numero}
+            onChange={(e) => setNumero(Number(e.target.value))}
+            placeholder="Número"
+            className="border rounded p-4 w-full text-lg"
+          />
+          <TextArea
+            value={referencia}
+            onChange={(e) => setReferencia(e.target.value)}
+            autoSize
             placeholder="Referência"
-            className="border rounded p-2 w-full"
+            className="border rounded p-4 w-full text-lg"
           />
 
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={onCloseCancelar}
-              className="bg-gray-300 text-black p-2 rounded"
+              onClick={handleCancel}
+              className="bg-gray-300 text-black p-4 text-lg rounded"
             >
               Cancelar
             </button>
             <button
-              type="submit"
-              className="bg-blue-500 text-white p-2 rounded"
+              type="button"
+              onClick={handleSubmit}
+              className="bg-blue-500 text-white p-4 text-lg rounded"
             >
               Salvar
             </button>
