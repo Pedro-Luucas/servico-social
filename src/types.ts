@@ -36,3 +36,24 @@ export interface Familiar {
   escolaridade: string;
   salario: number;
 }
+
+export interface DadosUsuario {
+  familiares: Familiar[];
+  fonteRenda: string;
+  valorRenda: number;
+  moradia: string;
+  agua: string;
+  energia: string;
+  bens: string;
+  internet: boolean;
+  CRAS: string;
+  acesso: string;
+  descDoenca: string;
+  medicamentos: string;
+  medicamentosGasto: number;
+  tratamento: string;
+  nutri: string;
+  tempoTratamento: string;
+  local: string;
+  encaminhamento: string;
+}

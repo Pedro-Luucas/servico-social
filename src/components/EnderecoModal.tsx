@@ -18,7 +18,7 @@ const AddressModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialDat
   const [municipio, setMunicipio] = useState(initialData?.municipio || '');
   const [bairro, setBairro] = useState(initialData?.bairro || '');
   const [rua, setRua] = useState(initialData?.rua || '');
-  const [numero, setNumero] = useState(initialData?.numero || 0);
+  const [numero, setNumero] = useState(initialData?.numero || NaN);
   const [referencia, setReferencia] = useState(initialData?.referencia || '');
 
   // Função para tratar a mudança no CEP e buscar o endereço via API

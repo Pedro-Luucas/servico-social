@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { User, Endereco } from '../types';
 import AddressModal from '../components/EnderecoModal';
 import { DatePicker, Input, Select, Button } from "antd";
+import { useNavigate } from 'react-router-dom';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
+  id: string
   initialData?: User;
+  Usuario?: boolean;
 }
 
-const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
+
+
+const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id, Usuario }) => {
   const [formData, setFormData] = useState<User>(initialData || {
-    id: '',
+    id: id,
     nome: '',
     cpf: '',
     rg: '',
@@ -23,7 +28,10 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [endereco, setEndereco] = useState<Endereco | null>(null);
-  
+
+  const navigate = useNavigate();
+
+
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
     setEndereco(enderecoData);
     setFormData({ ...formData, endereco: enderecoData });
@@ -33,6 +41,14 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     console.log(formData)
+  };
+
+  const handleAdicionarDados = () => {
+    if (formData.id) {
+      navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
+    } else {
+      alert('O ID do usuário não está definido');
+    }
   };
 
   const handleDate = (date: Date) => {
@@ -115,6 +131,13 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
               { value: 'Ensino superior completo', label: 'Ensino superior completo' },
             ]}
           />
+          <button
+            type="button"
+            onClick={handleAdicionarDados}
+            className="md:col-span-2 bg-orange-500 text-white p-2 md:p-4 w-full text-lg rounded"
+          >
+            Adicionar Dados
+          </button>
           <button
             type="button"
             onClick={() => setShowModal(true)}
