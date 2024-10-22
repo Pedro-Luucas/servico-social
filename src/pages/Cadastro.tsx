@@ -131,26 +131,29 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id, Usuario 
               { value: 'Ensino superior completo', label: 'Ensino superior completo' },
             ]}
           />
-          <button
-            type="button"
+          <Button
+            type='primary'
+            htmlType="button"
             onClick={handleAdicionarDados}
-            className="md:col-span-2 bg-orange-500 text-white p-2 md:p-4 w-full text-lg rounded"
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
           >
             Adicionar Dados
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            type='primary'
+            htmlType="button"
             onClick={() => setShowModal(true)}
-            className="md:col-span-2 bg-green-500 text-white p-2 md:p-4 w-full text-lg rounded"
-          >
-            Adicionar Endereço
-          </button>
-          <button
-            type="submit"
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
           >
-            Submit
-          </button>
+            Adicionar Endereço
+          </Button>
+          <Button
+            type='primary'
+            htmlType="submit"
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
+          >
+            Cadastrar
+          </Button>
         </form>
 
         {showModal && (

@@ -20,7 +20,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route index element={ <UserForm onSubmit={handleAddUser} id='teste' initialData={editingUser || undefined}/>}/>
+        <Route path="/cadastro" element={ <UserForm onSubmit={handleAddUser} id='teste' initialData={editingUser || undefined}/>}/>
         <Route path="/adicionar-dados/:id" element={<AdicionarDados />} />
       </Routes>
     </BrowserRouter>
