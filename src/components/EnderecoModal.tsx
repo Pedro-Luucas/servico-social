@@ -13,7 +13,7 @@ interface AddressModalProps {
   initialData?: Endereco | null;
 }
 
-const AddressModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialData }) => {
+const EnderecoModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialData }) => {
   const [cep, setCep] = useState(initialData?.CEP || '');
   const [municipio, setMunicipio] = useState(initialData?.municipio || '');
   const [bairro, setBairro] = useState(initialData?.bairro || '');
@@ -161,4 +161,4 @@ const AddressModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialDat
   );
 };
 
-export default AddressModal;
+export default EnderecoModal;

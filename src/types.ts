@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export interface User {
     id: string;
     nome: string;
@@ -37,8 +39,15 @@ export interface Familiar {
   salario: number;
 }
 
+export interface CRAS {
+  cras: boolean;
+  acesso: boolean;
+  chave: string;
+  senha: string;
+}
+
 export interface DadosUsuario {
-  familiares: Familiar[];
+  familiares?: Familiar[];
   fonteRenda: string;
   valorRenda: number;
   moradia: string;
@@ -46,7 +55,7 @@ export interface DadosUsuario {
   energia: string;
   bens: string;
   internet: boolean;
-  CRAS: string;
+  CRAS?: CRAS;
   acesso: string;
   descDoenca: string;
   medicamentos: string;
