@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DadosUsuario, Familiar, CRAS } from '../types';
 import type { CheckboxProps } from 'antd';
-import { Input, Select, Checkbox, Button } from 'antd';
-import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input, Select, Checkbox, Button, List, Card } from 'antd';
+import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import FamiliarModal from '../components/FamiliarModal';
 
 const { TextArea } = Input;
@@ -29,22 +29,50 @@ const AdicionarDados: React.FC = () => {
     tempoTratamento: '',
     local: '',
     encaminhamento: '',
+    ativo: false,
+    obito: false
   });
 
   const navigate = useNavigate();
 
   //Familiares
+  const escolaridades = ['Ensino Fundamental incompleto','Ensino Fundamental completo','Ensino Medio incompleto','Ensino Medio completo','Ensino Superior incompleto','Ensino Superior completo']
+
   const [showModal, setShowModal] = useState(false);
-  const [familiar, setFamiliar] = useState<Familiar | null>(null);
+  
+  const [editFamiliar, setEditFamiliar] = useState(false);
+  const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
+  
   const handleFamiliarSubmit = (familiarData: Familiar) => {
-    setFamiliar(familiarData);
-    setFormData((prevState) => ({
-      ...prevState,
-      familiares: [...(prevState.familiares || []), familiarData]
-    }));
-    setShowModal(false);
-    console.log(formData)
+    setFormData((prevState) => {
+      const familiares = prevState.familiares || [];
+
+      // Verifica se está editando um familiar
+      if (familiarToEdit) {
+        // Atualiza o familiar editado
+        const updatedFamiliares = familiares.map((f) =>
+          f.nome === familiarToEdit.nome ? familiarData : f
+        );
+        return { ...prevState, familiares: updatedFamiliares };
+      } else {
+        // Adiciona um novo familiar
+        return { ...prevState, familiares: [...familiares, familiarData] };
+      }
+    });
+
+    setShowModal(false); // Fecha o modal após salvar
+    setFamiliarToEdit(null); // Limpa o familiar a ser editado
   };
+
+  const handleEditFamiliar = (f: Familiar) => {
+    setFamiliarToEdit(f); // Define o familiar a ser editado
+    setShowModal(true); // Abre o modal para edição
+  };
+
+  const handleDeleteFamiliar = (familiarToDelete: Familiar) => {
+    return
+  };
+
 
   //CRAS
   const [isCRAS, setIsCRAS] = useState(false)
@@ -59,6 +87,7 @@ const AdicionarDados: React.FC = () => {
     setIsAcesso(e.target.checked)
 
   }
+
 
   // SN SIM OU NAO
   const [isNet, setIsNet] = useState(false)
@@ -75,6 +104,9 @@ const AdicionarDados: React.FC = () => {
   var SNacesso = isAcesso ? 'Sim' : 'Não'
 
 
+
+
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -89,25 +121,6 @@ const AdicionarDados: React.FC = () => {
   };
 
   const handleVoltar = () => {
-    setFormData({
-      familiares: [{ nome: '', escolaridade: '', profissao: '', idade: 0, salario: 0, parentesco: '' }],
-      fonteRenda: '',
-      valorRenda: NaN,
-      moradia: '',
-      agua: '',
-      energia: '',
-      bens: '',
-      internet: false,
-      acesso: '',
-      descDoenca: '',
-      medicamentos: '',
-      medicamentosGasto: NaN,
-      tratamento: '',
-      nutri: '',
-      tempoTratamento: '',
-      local: '',
-      encaminhamento: '',
-    });
     navigate('/Cadastro')
   };
 
@@ -248,7 +261,7 @@ const AdicionarDados: React.FC = () => {
             <label className="text-lg">Descrição da Doença</label>
             <TextArea
               name="descDoenca"
-              placeholder="Descrição de Doenças"
+              placeholder="Descrição da Doença"
               value={formData.descDoenca}
               className="border rounded p-2 w-full text-lg"
             />
@@ -328,25 +341,62 @@ const AdicionarDados: React.FC = () => {
             />
           </div>
 
-
           <Button
             type="primary" htmlType="button"
+            color="default" variant="filled"
             onClick={() => setShowModal(true)} 
-            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
+            className="md:col-span-2 bg-blue-500 mt-3 p-2 md:p-4 w-full text-lg rounded"
           >
             Adicionar Familiar
           </Button>
 
+          <div className='md:col-span-2'>
+            <h1 className='text-2xl md:text-2xl font-bold mb-2 md:mb-4 text-center'>Familiares</h1>
+              <List
+                grid={{
+                  gutter: 14,
+                  xs: 1,
+                  sm: 2,
+                  md: 4,
+                  lg: 4,
+                }}
+                dataSource={formData.familiares}
+                renderItem={(f) => (
+                  <List.Item>
+                    <Card title={f.nome} extra={
+                        <div>
+                          <Button type='text' icon={<EditOutlined />} onClick={() => {handleEditFamiliar(f)}} className='ml-1' />
+                          <Button type='text' icon={<CloseOutlined />} onClick={() => {handleDeleteFamiliar(f)}} />
+                          </div>}>
+                      <p>{f.parentesco}</p>
+                      <p>{f.idade} anos</p>
+                      <p>{escolaridades[f.escolaridade]}</p>
+                      <p>{f.profissao}</p>
+                      <p>{f.salario}</p>
+                    </Card>
+                  </List.Item>
+                )}
+              />
+          </div>
+
           {/* Botão de Envio */}
-          <Button type="primary" htmlType="submit" className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded">
+          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded">
             Enviar Dados
           </Button>
         </form>
         {showModal && (
           <FamiliarModal
+            initialData={familiarToEdit}
             onClose={() => setShowModal(false)}
             onSave={handleFamiliarSubmit}
           />)}
+        {/*showModalEdit && (
+          <FamiliarModal
+            
+            onClose={() => setShowModalEdit(false)}
+            onSave={handleFamiliarSubmit}
+          />)*/}
+      
       </div>
     </div>
   );

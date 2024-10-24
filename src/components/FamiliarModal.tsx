@@ -14,17 +14,20 @@ const FamiliarModal: React.FC<FamiliarModalProps> = ({ onClose, onSave, initialD
   const [parentesco, setParentesco] = useState(initialData?.parentesco || '');
   const [idade, setIdade] = useState(initialData?.idade || NaN);
   const [profissao, setProfissao] = useState(initialData?.profissao || '');
-  const [escolaridade, setEscolaridade] = useState(initialData?.escolaridade || '');
+  const [escolaridade, setEscolaridade] = useState(initialData?.escolaridade || 0);
   const [salario, setSalario] = useState(initialData?.salario || NaN);
 
+  var addOrEdit = 'Adicionar';
+  
   // Atualiza os valores iniciais caso initialData seja fornecido
   useEffect(() => {
     if (initialData) {
+      addOrEdit = 'Editar';
       setNome(initialData.nome || '');
       setParentesco(initialData.parentesco || '');
       setIdade(initialData.idade || NaN);
       setProfissao(initialData.profissao || '');
-      setEscolaridade(initialData.escolaridade || '');
+      setEscolaridade(initialData.escolaridade || NaN);
       setSalario(initialData.salario || NaN);
     }
   }, [initialData]);
@@ -49,7 +52,7 @@ const FamiliarModal: React.FC<FamiliarModalProps> = ({ onClose, onSave, initialD
     setParentesco('');
     setIdade(NaN);
     setProfissao('');
-    setEscolaridade('');
+    setEscolaridade(NaN);
     setSalario(NaN);
     onClose();
   };
@@ -58,67 +61,86 @@ const FamiliarModal: React.FC<FamiliarModalProps> = ({ onClose, onSave, initialD
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded shadow-lg w-96">
         <div className="flex flex-row justify-between">
-          <h2 className="text-xl mb-4">Adicionar Familiar</h2>
+          <h2 className="text-xl mb-4">{addOrEdit} Familiar</h2>
           <Button type='text' icon={<CloseOutlined />} onClick={onClose} className='self-start' />
         </div>
 
         <form className="grid grid-cols-1 gap-4">
           {/* Nome */}
-          <Input
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="Nome"
-            className="border rounded p-4 w-full text-lg"
-          />
+          <div>
+            <label className="block text-sm">Nome</label>
+            <Input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Nome"
+              className="border rounded p-4 w-full text-lg"
+            />
+          </div>
 
           {/* Parentesco */}
-          <Input
-            value={parentesco}
-            onChange={(e) => setParentesco(e.target.value)}
-            placeholder="Parentesco"
-            className="border rounded p-4 w-full text-lg"
-          />
+          <div>
+            <label className="block text-sm">Parentesco</label>
+            <Input
+              value={parentesco}
+              onChange={(e) => setParentesco(e.target.value)}
+              placeholder="Parentesco"
+              className="border rounded p-4 w-full text-lg"
+            />
+          </div>
 
           {/* Idade */}
-          <Input
-            type="number"
-            value={idade}
-            onChange={(e) => setIdade(Number(e.target.value))}
-            placeholder="Idade"
-            className="border rounded p-4 w-full text-lg"
-          />
+          <div>
+            <label className="block text-sm">Idade</label>
+            <Input
+              type="number"
+              value={idade}
+              onChange={(e) => setIdade(Number(e.target.value))}
+              placeholder="Idade"
+              className="border rounded p-4 w-full text-lg"
+            />
+          </div>
 
           {/* Profissão */}
-          <Input
-            value={profissao}
-            onChange={(e) => setProfissao(e.target.value)}
-            placeholder="Profissão"
-            className="border rounded p-4 w-full text-lg"
-          />
+          <div>
+            <label className="block text-sm">Profissão</label>
+            <Input
+              value={profissao}
+              onChange={(e) => setProfissao(e.target.value)}
+              placeholder="Profissão"
+              className="border rounded p-4 w-full text-lg"
+            />
+          </div>
 
           {/* Escolaridade */}
-          <Select
+          <div>
+            <label className="block text-sm ">Escolaridade</label>
+            <Select
+              value={escolaridade}
               placeholder="Escolaridade"
               onChange={(value) => setEscolaridade(value)}
               className="w-full size-full text-lg"
               options={[
-                { value: 'ef-incompleto', label: 'Ensino fundamental incompleto' },
-                { value: 'ef-completo', label: 'Ensino fundamental completo' },
-                { value: 'em-incompleto', label: 'Ensino médio incompleto' },
-                { value: 'em-completo', label: 'Ensino médio completo' },
-                { value: 'es-incompleto', label: 'Ensino superior incompleto' },
-                { value: 'es-completo', label: 'Ensino superior completo' },
+                { value: 0, label: 'Ensino fundamental incompleto' },
+                { value: 1, label: 'Ensino fundamental completo' },
+                { value: 2, label: 'Ensino médio incompleto' },
+                { value: 3, label: 'Ensino médio completo' },
+                { value: 4, label: 'Ensino superior incompleto' },
+                { value: 5, label: 'Ensino superior completo' },
               ]}
             />
+          </div>
 
           {/* Salário */}
-          <Input
-            type="number"
-            value={salario}
-            onChange={(e) => setSalario(Number(e.target.value))}
-            placeholder="Salário"
-            className="border rounded p-4 w-full text-lg"
-          />
+          <div>
+            <label className="block text-sm mt-2">Salário</label>
+            <Input
+              type="number"
+              value={salario}
+              onChange={(e) => setSalario(Number(e.target.value))}
+              placeholder="Salário"
+              className="border rounded p-4 w-full text-lg"
+            />
+          </div>
 
           {/* Botões de Ação */}
           <div className="flex justify-end space-x-4">

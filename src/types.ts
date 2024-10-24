@@ -35,7 +35,7 @@ export interface Familiar {
   parentesco: string;
   idade: number;
   profissao: string;
-  escolaridade: string;
+  escolaridade: number;
   salario: number;
 }
 
@@ -65,4 +65,6 @@ export interface DadosUsuario {
   tempoTratamento: string;
   local: string;
   encaminhamento: string;
+  ativo: boolean;
+  obito: boolean;
 }
