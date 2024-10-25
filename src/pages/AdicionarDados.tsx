@@ -35,14 +35,15 @@ const AdicionarDados: React.FC = () => {
 
   const navigate = useNavigate();
 
-  //Familiares
+//Familiares
   const escolaridades = ['Ensino Fundamental incompleto','Ensino Fundamental completo','Ensino Medio incompleto','Ensino Medio completo','Ensino Superior incompleto','Ensino Superior completo']
 
   const [showModal, setShowModal] = useState(false);
-  
-  const [editFamiliar, setEditFamiliar] = useState(false);
+  const [showModalConfirm, setShowModalConfirm] = useState(false);
+
   const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
   
+ //ADICIONAR FAMILIAR
   const handleFamiliarSubmit = (familiarData: Familiar) => {
     setFormData((prevState) => {
       const familiares = prevState.familiares || [];
@@ -64,17 +65,28 @@ const AdicionarDados: React.FC = () => {
     setFamiliarToEdit(null); // Limpa o familiar a ser editado
   };
 
-  const handleEditFamiliar = (f: Familiar) => {
-    setFamiliarToEdit(f); // Define o familiar a ser editado
+
+ //EDITAR FAMILIAR
+  const handleEditFamiliar = (familiarData: Familiar) => {
+    setFamiliarToEdit(familiarData); // Define o familiar a ser editado
     setShowModal(true); // Abre o modal para edição
   };
 
+
+ //DELETAR FAMILIAR
   const handleDeleteFamiliar = (familiarToDelete: Familiar) => {
-    return
+    // Filtra os familiares pra deletar o familiarToDelete com essa gambiarra de operador ternario pq o TS nao para de apitar
+    const updatedFamiliares = formData.familiares ? formData.familiares.filter(f => f !== familiarToDelete) : formData.familiares;
+    
+    // Atualiza o estado com a nova lista de familiares
+    setFormData({
+      ...formData,
+      familiares: updatedFamiliares,
+    });
   };
 
 
-  //CRAS
+//CRAS
   const [isCRAS, setIsCRAS] = useState(false)
   const [isAcesso, setIsAcesso] = useState(false)
   var acessoVisibility = isCRAS ? '' : 'hidden'
@@ -89,7 +101,7 @@ const AdicionarDados: React.FC = () => {
   }
 
 
-  // SN SIM OU NAO
+// SN SIM OU NAO
   const [isNet, setIsNet] = useState(false)
   const [isNutri, setIsNutri] = useState(false)
   const toggleNet: CheckboxProps['onChange'] = (e) => {
@@ -106,7 +118,7 @@ const AdicionarDados: React.FC = () => {
 
 
 
-
+//HANDLE AS COISA
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -116,19 +128,15 @@ const AdicionarDados: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, internet: e.target.checked });
-  };
-
   const handleVoltar = () => {
     navigate('/Cadastro')
   };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Dados do Usuário:', formData);
   };
+
 
   return (
     <div className="container mx-auto p-4 md:p-8">
