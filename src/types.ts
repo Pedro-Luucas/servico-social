@@ -5,11 +5,27 @@ export interface User {
     nome: string;
     cpf: string;
     rg: string;
-    data: string;
+    data?: Date;
     endereco?: Endereco;
     telefone: string;
     profissao: string;
-    escolaridade: string;
+    escolaridade: number;
+    patologia: string;
+    dados: DadosUsuario;
+    responsavel: Responsavel;
+    ativo: boolean;
+    obito: boolean;
+  }
+
+  export interface Responsavel {
+    nome: string;
+    cpf: string;
+    idade: number;
+    endereco?: Endereco;
+    telefone: string;
+    profissao?: string;
+    escolaridade?: number;
+    parentesco: string;
   }
 
 export type Endereco = {
@@ -21,15 +37,6 @@ export type Endereco = {
     referencia?: string;
 }
 
-export interface Responsavel extends User {
-    parentesco: string;
-}
-
-export interface Usuario extends User {
-  patologia: string;
-  familiares: Familiar[]
-}
-
 export interface Familiar {
   nome: string;
   parentesco: string;
@@ -38,6 +45,7 @@ export interface Familiar {
   escolaridade: number;
   salario: number;
 }
+export const escolaridades = ['Ensino Fundamental incompleto','Ensino Fundamental completo','Ensino Medio incompleto','Ensino Medio completo','Ensino Superior incompleto','Ensino Superior completo']
 
 export interface CRAS {
   cras: boolean;
@@ -65,6 +73,4 @@ export interface DadosUsuario {
   tempoTratamento: string;
   local: string;
   encaminhamento: string;
-  ativo: boolean;
-  obito: boolean;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from './types';
-import UserForm from './pages/Cadastro';
+import Cadastro from './pages/Cadastro';
 import Home from './pages/Home';
 import AdicionarDados from './pages/AdicionarDados';
 import UserList from './components/UserList';
@@ -20,8 +20,8 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/cadastro" element={ <UserForm onSubmit={handleAddUser} id='teste' initialData={editingUser || undefined}/>}/>
-        <Route path="/adicionar-dados/:id" element={<AdicionarDados />} />
+        <Route path="/cadastro" element={ <Cadastro onSubmit={handleAddUser} id='teste' initialData={editingUser || undefined}/>}/>
+        <Route path="/adicionar-dados/:id" element={<AdicionarDados />}/>
       </Routes>
     </BrowserRouter>
   );

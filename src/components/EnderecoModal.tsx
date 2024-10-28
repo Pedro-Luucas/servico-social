@@ -90,7 +90,7 @@ const EnderecoModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialDa
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center outline-none">
       <div className="bg-white p-6 rounded shadow-lg w-96">
         <div className="flex flex-row justify-between">
           <h2 className="text-xl mb-4">Adicionar Endereço</h2>
@@ -110,50 +110,52 @@ const EnderecoModal: React.FC<AddressModalProps> = ({ onClose, onSave, initialDa
             value={municipio}
             onChange={(e) => setMunicipio(e.target.value)}
             placeholder="Município"
-            className="border rounded p-4 w-full text-lg"
+            className="p-4 w-full text-lg"
           />
           <Input
             value={bairro}
             onChange={(e) => setBairro(e.target.value)}
             placeholder="Bairro"
-            className="border rounded p-4 w-full text-lg"
+            className="p-4 w-full text-lg"
           />
           <Input
             value={rua}
             onChange={(e) => setRua(e.target.value)}
             placeholder="Rua"
-            className="border rounded p-4 w-full text-lg"
+            className="p-4 w-full text-lg"
           />
           <Input
             type="number"
             value={numero}
             onChange={(e) => setNumero(Number(e.target.value))}
             placeholder="Número"
-            className="border rounded p-4 w-full text-lg"
+            className="p-4 w-full text-lg"
           />
           <TextArea
             value={referencia}
             onChange={(e) => setReferencia(e.target.value)}
             autoSize
             placeholder="Referência"
-            className="border rounded p-4 w-full text-lg"
+            className="p-4 w-full text-lg"
           />
 
           <div className="flex justify-end space-x-4">
-            <button
-              type="button"
+            <Button
+              type='primary'
+              color='default'
+              variant='filled'
               onClick={handleCancel}
-              className="bg-gray-300 text-black p-4 text-lg rounded"
+              className="p-4 text-lg rounded"
             >
               Cancelar
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              type='primary'
               onClick={handleSubmit}
-              className="bg-blue-500 text-white p-4 text-lg rounded"
+              className="p-4 text-lg rounded"
             >
               Salvar
-            </button>
+            </Button>
           </div>
         </form>
       </div>

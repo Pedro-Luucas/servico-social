@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DadosUsuario, Familiar, CRAS } from '../types';
+import { DadosUsuario, Familiar, CRAS, escolaridades } from '../types';
 import type { CheckboxProps } from 'antd';
 import { Input, Select, Checkbox, Button, List, Card } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
@@ -12,7 +12,7 @@ const AdicionarDados: React.FC = () => {
   
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
-  const [formData, setFormData] = useState<DadosUsuario>({
+  const [dados, setDados] = useState<DadosUsuario>({
     fonteRenda: '',
     valorRenda: NaN,
     moradia: '',
@@ -28,24 +28,21 @@ const AdicionarDados: React.FC = () => {
     nutri: '',
     tempoTratamento: '',
     local: '',
-    encaminhamento: '',
-    ativo: false,
-    obito: false
+    encaminhamento: ''
   });
 
   const navigate = useNavigate();
 
 //Familiares
-  const escolaridades = ['Ensino Fundamental incompleto','Ensino Fundamental completo','Ensino Medio incompleto','Ensino Medio completo','Ensino Superior incompleto','Ensino Superior completo']
+  
 
   const [showModal, setShowModal] = useState(false);
-  const [showModalConfirm, setShowModalConfirm] = useState(false);
 
   const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
   
  //ADICIONAR FAMILIAR
   const handleFamiliarSubmit = (familiarData: Familiar) => {
-    setFormData((prevState) => {
+    setDados((prevState) => {
       const familiares = prevState.familiares || [];
 
       // Verifica se está editando um familiar
@@ -76,11 +73,11 @@ const AdicionarDados: React.FC = () => {
  //DELETAR FAMILIAR
   const handleDeleteFamiliar = (familiarToDelete: Familiar) => {
     // Filtra os familiares pra deletar o familiarToDelete com essa gambiarra de operador ternario pq o TS nao para de apitar
-    const updatedFamiliares = formData.familiares ? formData.familiares.filter(f => f !== familiarToDelete) : formData.familiares;
+    const updatedFamiliares = dados.familiares ? dados.familiares.filter(f => f !== familiarToDelete) : dados.familiares;
     
     // Atualiza o estado com a nova lista de familiares
-    setFormData({
-      ...formData,
+    setDados({
+      ...dados,
       familiares: updatedFamiliares,
     });
   };
@@ -121,11 +118,11 @@ const AdicionarDados: React.FC = () => {
 //HANDLE AS COISA
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setDados({ ...dados, [name]: value });
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value });
+    setDados({ ...dados, [name]: value });
   };
 
   const handleVoltar = () => {
@@ -134,7 +131,7 @@ const AdicionarDados: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados do Usuário:', formData);
+    console.log('Dados do Usuário:', dados);
   };
 
 
@@ -177,7 +174,7 @@ const AdicionarDados: React.FC = () => {
               name="valorRenda"
               placeholder="Valor da Renda"
               type="number"
-              value={formData.valorRenda}
+              value={dados.valorRenda}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -235,7 +232,7 @@ const AdicionarDados: React.FC = () => {
             <Input
               name="bens"
               placeholder="Bens Possuídos"
-              value={formData.bens}
+              value={dados.bens}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -270,7 +267,7 @@ const AdicionarDados: React.FC = () => {
             <TextArea
               name="descDoenca"
               placeholder="Descrição da Doença"
-              value={formData.descDoenca}
+              value={dados.descDoenca}
               className="border rounded p-2 w-full text-lg"
             />
           </div>
@@ -281,7 +278,7 @@ const AdicionarDados: React.FC = () => {
             <Input
               name="medicamentos"
               placeholder="Medicamentos Usados"
-              value={formData.medicamentos}
+              value={dados.medicamentos}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -294,7 +291,7 @@ const AdicionarDados: React.FC = () => {
               name="medicamentosGasto"
               placeholder="Gasto com Medicamentos"
               type="number"
-              value={formData.medicamentosGasto}
+              value={dados.medicamentosGasto}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -320,7 +317,7 @@ const AdicionarDados: React.FC = () => {
             <Input
               name="tempoTratamento"
               placeholder="Tempo de Tratamento"
-              value={formData.tempoTratamento}
+              value={dados.tempoTratamento}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -332,7 +329,7 @@ const AdicionarDados: React.FC = () => {
             <Input
               name="local"
               placeholder="Local do Tratamento"
-              value={formData.local}
+              value={dados.local}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -368,7 +365,7 @@ const AdicionarDados: React.FC = () => {
                   md: 4,
                   lg: 4,
                 }}
-                dataSource={formData.familiares}
+                dataSource={dados.familiares}
                 renderItem={(f) => (
                   <List.Item>
                     <Card title={f.nome} extra={

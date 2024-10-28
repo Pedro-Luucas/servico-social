@@ -144,20 +144,22 @@ const FamiliarModal: React.FC<FamiliarModalProps> = ({ onClose, onSave, initialD
 
           {/* Botões de Ação */}
           <div className="flex justify-end space-x-4">
-            <button
-              type="button"
+            <Button
+              type='primary'
+              color='default'
+              variant='filled'
               onClick={handleCancel}
-              className="bg-gray-300 text-black p-4 text-lg rounded"
+              className="p-4 text-lg rounded"
             >
               Cancelar
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              type='primary'
               onClick={handleSubmit}
-              className="bg-blue-500 text-white p-4 text-lg rounded"
+              className="p-4 text-lg rounded"
             >
               Salvar
-            </button>
+            </Button>
           </div>
         </form>
       </div>
