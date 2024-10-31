@@ -5,26 +5,23 @@ import Home from './pages/Home';
 import AdicionarDados from './pages/AdicionarDados';
 import UserList from './components/UserList';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserRouter as Router, Route, Routes, Link, BrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+const router = createBrowserRouter([
+  {
+    path: '/cadastro',
+    element: <Cadastro onSubmit={() => {}} id={'teste'} initialData={undefined} />
+  },
+  {
+    path: '/adicionar-dados/:id',
+    element: <AdicionarDados />
+  }
+]);
 
 const App: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
   
-  const handleAddUser = (user: User) => {
-    return 
-  }
+  return <RouterProvider router={router} />;
 
-  //<Route index element={<Home/>} />
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/cadastro" element={ <Cadastro onSubmit={handleAddUser} id='teste' initialData={editingUser || undefined}/>}/>
-        <Route path="/adicionar-dados/:id" element={<AdicionarDados />}/>
-      </Routes>
-    </BrowserRouter>
-  );
 };
 
 export default App;

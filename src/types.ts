@@ -5,7 +5,7 @@ export interface User {
     nome: string;
     cpf: string;
     rg: string;
-    data?: Date;
+    data?: string;
     endereco?: Endereco;
     telefone: string;
     profissao: string;
@@ -13,8 +13,7 @@ export interface User {
     patologia: string;
     dados: DadosUsuario;
     responsavel: Responsavel;
-    ativo: boolean;
-    obito: boolean;
+    ativo: number;
   }
 
   export interface Responsavel {

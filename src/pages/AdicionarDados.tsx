@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DadosUsuario, Familiar, CRAS, escolaridades } from '../types';
 import type { CheckboxProps } from 'antd';
@@ -32,6 +32,7 @@ const AdicionarDados: React.FC = () => {
   });
 
   const navigate = useNavigate();
+
 
 //Familiares
   

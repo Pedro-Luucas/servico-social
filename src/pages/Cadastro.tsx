@@ -3,8 +3,8 @@ import { Responsavel, User, Endereco, escolaridades } from '../types';
 import EnderecoModal from '../components/EnderecoModal';
 import { DatePicker, Input, Select, Button, Radio } from "antd";
 import type { RadioChangeEvent } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { json } from 'stream/consumers';
+import { Link } from 'react-router-dom';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
@@ -13,134 +13,120 @@ interface UserFormProps {
 }
 
 const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
-  const [formData, setFormData] = useState<User>(initialData || {
-    id: id,
+  let user = {
+  id: id,
+  nome: '',
+  cpf: '',
+  rg: '',
+  data: undefined,
+  telefone: '',
+  profissao: '',
+  escolaridade: NaN,
+  endereco: undefined,
+  patologia: '',
+  dados: {
+    fonteRenda: '',
+    valorRenda: NaN,
+    moradia: '',
+    agua: '',
+    energia: '',
+    bens: '',
+    internet: false,
+    acesso: '',
+    descDoenca: '',
+    medicamentos: '',
+    medicamentosGasto: NaN,
+    tratamento: '',
+    nutri: '',
+    tempoTratamento: '',
+    local: '',
+    encaminhamento: '',
+  },
+  responsavel: {
     nome: '',
     cpf: '',
-    rg: '',
-    data: undefined,
+    idade: NaN,
+    endereco: undefined,
     telefone: '',
     profissao: '',
     escolaridade: NaN,
-    endereco: undefined,
-    patologia: '',
-    dados: {
-      fonteRenda: '',
-      valorRenda: NaN,
-      moradia: '',
-      agua: '',
-      energia: '',
-      bens: '',
-      internet: false,
-      acesso: '',
-      descDoenca: '',
-      medicamentos: '',
-      medicamentosGasto: NaN,
-      tratamento: '',
-      nutri: '',
-      tempoTratamento: '',
-      local: '',
-      encaminhamento: '',
-    },
-    responsavel: {
-      nome: '',
-      cpf: '',
-      idade: NaN,
-      endereco: undefined,
-      telefone: '',
-      profissao: '',
-      escolaridade: NaN,
-      parentesco: '',
-    },
-    ativo: false,
-    obito: false,
-  });
+    parentesco: '',
+  },
+  ativo: 1,
+}
+  const storedFormData = sessionStorage.getItem('formData'); 
+  if(storedFormData){
+    user = JSON.parse(storedFormData)
+  }
 
-// Carrega formData do localStorage na montagem  
+//HOOKS
+  const [formData, setFormData] = useState<User>(user);
+
+  const [showModal, setShowModal] = useState(false);
+  const [endereco, setEndereco] = useState<Endereco | undefined>(formData.endereco);
+  const [ativo, setAtivo] = useState(formData.ativo);
+  const [escolaridade, setEscolaridade] = useState(formData.escolaridade);
+
+  let aniversario: dayjs.Dayjs | undefined = undefined;
+  if (typeof formData.data === 'string' && formData.data.trim() !== '') {
+    aniversario = dayjs(formData.data);
+  }
+  
+  const [dataNasc, setDataNasc] = useState<dayjs.Dayjs | undefined>(aniversario);
+
+//Carrega formData do sessionStorage na montagem  
   useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
+    const storedFormData = sessionStorage.getItem('formData');
     if (storedFormData) {
-      setFormData(JSON.parse(storedFormData) as User);
+      let formdata = JSON.parse(storedFormData)
+      setFormData(formdata as User);
       console.log(formData)
     }
     console.log('CARREGOU')
   }, []); 
 
-// Salva formData no localStorage sempre que mudar
+//Salva formData no sessionStorage sempre que formData mudar
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
+    const storedFormData = sessionStorage.getItem('formData');
+    sessionStorage.setItem('formData', JSON.stringify(formData));
+    if(storedFormData){
+    console.log('SALVANDO: ',JSON.parse(storedFormData))}
   }, [formData]);
 
 
 
-  const navigate = useNavigate();
   
-  const [showModal, setShowModal] = useState(false);
-  const [endereco, setEndereco] = useState<Endereco | null>(null);
-  const [ativo, setAtivo] = useState(1);
-
-  // const isAtivo = (formData.ativo ? true : false) && (formData.obito ? false : true)
-  // const isInativo = (formData.ativo ? false : true) && (formData.obito ? false : true)
-  // const isObito = (formData.ativo ? false : true) && (formData.obito ? true : false)
-  // const isInvalido = (formData.ativo ? true : false) && (formData.obito ? true : false)
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setFormData({ ...formData, [e.target.name]: e.target.value });
-
-    console.log(formData);
   };
 
-  const handleDate = (data: Date) => {
+  const handleDate = (data: Dayjs | null) => {
     if (data) {
-      console.log('Date: ', data);
-
-      setFormData({ ...formData, data: data })
-
-
-    } else {
-      console.log('Clear');
+      setDataNasc(data);
+      setFormData({ ...formData, data: data.toISOString() });
     }
   };
 
-  const handleEscolaridade = (escolaridade: number) => {
-    if (escolaridade) {
-      console.log('escolaridade: ', escolaridades[escolaridade]);
-
-      setFormData({ ...formData, escolaridade: escolaridade })
-
-    } else {
-      console.log('Clear');
+  const handleEscolaridade = (escolaridadeN: number) => {
+    if (escolaridadeN) {
+      setEscolaridade(escolaridadeN)
+      setFormData({ ...formData, escolaridade: escolaridadeN })
+      
     }
   };
 
   const handleAtivo = (e: RadioChangeEvent) => {
-    switch(e.target.value){
-      case 0: {
-        setAtivo(0)
-        setFormData({ ...formData, ativo: true })
-        break;
-      }
-      case 1: {
-        setAtivo(1)
-        setFormData({ ...formData, ativo: false })
-        break;
-      }
-      case 2: {
-        setAtivo(2)
-        setFormData({ ...formData, ativo: false})
-        setFormData({ ...formData, obito: true})
-        break;
-      }
-    }
+    setAtivo(e.target.value)
+    setFormData({...formData, ativo: e.target.value})
   }
 
   const handleAdicionarDados = () => {
-    if (formData.id) {
-      navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
-    } else {
-      alert('O ID do usuário não está definido');
-    }
+   //if (formData.id) {
+   //  navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
+   //} else {
+   //  alert('O ID do usuário não está definido');
+   //}
   };
 
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
@@ -205,7 +191,8 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             <DatePicker
               name="data"
               placeholder="Data de nascimento"
-              onChange={handleDate}
+              value={dataNasc}
+              onChange={(value) => handleDate(value)}
               className="border rounded p-2 md:p-4 w-full text-lg"
             />
           </div>
@@ -240,6 +227,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             <Select
               placeholder="Escolaridade"
               onChange={handleEscolaridade}
+              value={escolaridade}
               className="w-full size-full text-lg"
               options={[
                 { value: 0, label: 'Ensino fundamental incompleto' },
@@ -281,7 +269,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             onClick={handleAdicionarDados}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
           >
-            Adicionar Dados
+            <Link to={'/adicionar-dados/' + formData.id}>Adicionar Dados</Link>
           </Button>
           <Button
             type="primary"
