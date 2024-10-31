@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DadosUsuario, Familiar, CRAS, escolaridades } from '../types';
 import type { CheckboxProps } from 'antd';
-import { Input, Select, Checkbox, Button, List, Card } from 'antd';
+import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import FamiliarModal from '../components/FamiliarModal';
 
@@ -38,8 +38,10 @@ const AdicionarDados: React.FC = () => {
   
 
   const [showModal, setShowModal] = useState(false);
+  const [showModalConfirm, setShowModalConfirm] = useState(false);
 
   const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
+  const [familiarToDelete, setFamiliarToDelete] = useState<Familiar | null>(null);
   
  //ADICIONAR FAMILIAR
   const handleFamiliarSubmit = (familiarData: Familiar) => {
@@ -64,15 +66,19 @@ const AdicionarDados: React.FC = () => {
   };
 
 
- //EDITAR FAMILIAR
+ // EDITAR FAMILIAR
   const handleEditFamiliar = (familiarData: Familiar) => {
     setFamiliarToEdit(familiarData); // Define o familiar a ser editado
     setShowModal(true); // Abre o modal para edição
   };
 
+ // DELETAR FAMILIAR
+  const handleDeleteFamiliar = (fToDelete: Familiar) => {
+    setFamiliarToDelete(fToDelete)
+    setShowModalConfirm(true)
+  }
 
- //DELETAR FAMILIAR
-  const handleDeleteFamiliar = (familiarToDelete: Familiar) => {
+  const deleteFamiliar = () => {
     // Filtra os familiares pra deletar o familiarToDelete com essa gambiarra de operador ternario pq o TS nao para de apitar
     const updatedFamiliares = dados.familiares ? dados.familiares.filter(f => f !== familiarToDelete) : dados.familiares;
     
@@ -81,7 +87,13 @@ const AdicionarDados: React.FC = () => {
       ...dados,
       familiares: updatedFamiliares,
     });
+    closeModalConfirm()
   };
+
+  const closeModalConfirm = () => {
+    setShowModalConfirm(false)
+  }
+  
 
 
 //CRAS
@@ -396,6 +408,18 @@ const AdicionarDados: React.FC = () => {
             onClose={() => setShowModal(false)}
             onSave={handleFamiliarSubmit}
           />)}
+                <Modal
+                  open={showModalConfirm}
+                  title={"Deseja deletar o familiar?"}
+                  onOk={deleteFamiliar}
+                  onCancel={closeModalConfirm}
+                  footer={(_, { OkBtn, CancelBtn }) => (
+                    <>
+                      <CancelBtn />
+                      <OkBtn />
+                    </>
+                  )}
+                  />
         {/*showModalEdit && (
           <FamiliarModal
             

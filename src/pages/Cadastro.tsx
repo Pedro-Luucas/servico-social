@@ -269,7 +269,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             onClick={handleAdicionarDados}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
           >
-            <Link to={'/adicionar-dados/' + formData.id}>Adicionar Dados</Link>
+            <Link to={'/adicionar-dados/' + formData.id} className='w-max'>Adicionar Dados</Link>
           </Button>
           <Button
             type="primary"
