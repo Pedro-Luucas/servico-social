@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-center">Bem-vindo ao Sistema de Serviço Social</h1>
+      <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-center">Bem vindo ao Sistema de Serviço Social</h1>
       <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md text-center">
         <p className="text-lg mb-6">Escolha uma opção abaixo:</p>
         

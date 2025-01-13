@@ -15,8 +15,12 @@ const router = createBrowserRouter([
   {
     path: '/adicionar-dados/:id',
     element: <AdicionarDados />
-  }
-]);
+  },
+  {
+    path: '/home',
+    element: <Home/>
+  },
+  ]);
 
 const App: React.FC = () => {
   
