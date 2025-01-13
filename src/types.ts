@@ -1,4 +1,4 @@
-import exp from "constants";
+
 
 export interface User {
     id: string;
@@ -11,7 +11,7 @@ export interface User {
     profissao: string;
     escolaridade: number;
     patologia: string;
-    dados: DadosUsuario;
+    dados?: DadosUsuario;
     responsavel: Responsavel;
     ativo: number;
   }

@@ -139,7 +139,7 @@ const AdicionarDados: React.FC = () => {
   };
 
   const handleVoltar = () => {
-    navigate('/Cadastro')
+    navigate('/cadastro-usuario')
   };
 
   const handleSubmit = (e: React.FormEvent) => {

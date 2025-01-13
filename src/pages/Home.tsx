@@ -6,7 +6,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
 
   const handleCadastroClick = () => {
-    navigate('/cadastro'); // Navega para a página de cadastro
+    navigate('/cadastroUsuario'); // Navega para a página de cadastro
   };
 
   const handlePesquisarClick = () => {

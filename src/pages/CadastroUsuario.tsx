@@ -12,7 +12,7 @@ interface UserFormProps {
   initialData?: User;
 }
 
-const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
+const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
   let user = {
   id: id,
   nome: '',
@@ -66,6 +66,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
   const [endereco, setEndereco] = useState<Endereco | undefined>(formData.endereco);
   const [ativo, setAtivo] = useState(formData.ativo);
   const [escolaridade, setEscolaridade] = useState(formData.escolaridade);
+  const [isFormComplete, setIsFormComplete] = useState(false);
 
   let aniversario: dayjs.Dayjs | undefined = undefined;
   if (typeof formData.data === 'string' && formData.data.trim() !== '') {
@@ -92,6 +93,22 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
     if(storedFormData){
     console.log('SALVANDO: ',JSON.parse(storedFormData))}
   }, [formData]);
+
+//Verifica se o formulário está completo toda vez que formData mudar
+  useEffect(() => {
+    const isComplete = 
+      formData.nome.trim() !== '' &&
+      formData.cpf.trim() !== '' &&
+      formData.rg.trim() !== '' &&
+      formData.data !== undefined &&
+      formData.telefone.trim() !== '' &&
+      formData.profissao.trim() !== '' &&
+      !isNaN(formData.escolaridade) &&
+      formData.patologia.trim() !== '';
+
+    setIsFormComplete(isComplete);
+  }, [formData]);
+
 
 
 
@@ -141,6 +158,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
     e.preventDefault();
     onSubmit(formData);
   };
+
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -268,6 +286,7 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             htmlType="button"
             onClick={handleAdicionarDados}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
+            disabled={!isFormComplete}
           >
             <Link to={'/adicionar-dados/' + formData.id} className='w-max'>Adicionar Dados</Link>
           </Button>
@@ -278,13 +297,6 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
           >
             Adicionar Endereço
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
-          >
-            Cadastrar
           </Button>
         </form>
 
@@ -300,4 +312,4 @@ const Cadastro: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
   );
 };
 
-export default Cadastro;
+export default CadastroUsuario;

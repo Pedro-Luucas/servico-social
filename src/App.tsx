@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from './types';
-import Cadastro from './pages/Cadastro';
+import CadastroUsuario from './pages/CadastroUsuario';
 import Home from './pages/Home';
 import AdicionarDados from './pages/AdicionarDados';
 import UserList from './components/UserList';
@@ -9,8 +9,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const router = createBrowserRouter([
   {
-    path: '/cadastro',
-    element: <Cadastro onSubmit={() => {}} id={'teste'} initialData={undefined} />
+    path: '/cadastro-usuario',
+    element: <CadastroUsuario onSubmit={() => {}} id={'teste'} initialData={undefined} />
   },
   {
     path: '/adicionar-dados/:id',
