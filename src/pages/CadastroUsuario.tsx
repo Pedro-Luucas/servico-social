@@ -5,6 +5,7 @@ import { DatePicker, Input, Select, Button, Radio } from "antd";
 import type { RadioChangeEvent } from 'antd';
 import { Link } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
+import api from '../service/api';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
@@ -139,11 +140,11 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
   }
 
   const handleAdicionarDados = () => {
-   //if (formData.id) {
-   //  navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
-   //} else {
-   //  alert('O ID do usuário não está definido');
-   //}
+   if (formData.id) {
+     navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
+   } else {
+     api.get('') // GERAR ID DO USUARIO
+   }
   };
 
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
