@@ -17,6 +17,7 @@ api.interceptors.request.use(
         password: password
       }
     }
+    return config
   },
   (error) => {
     return Promise.reject(error)

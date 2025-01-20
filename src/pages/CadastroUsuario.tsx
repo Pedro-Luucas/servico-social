@@ -140,11 +140,11 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
   }
 
   const handleAdicionarDados = () => {
-   if (formData.id) {
-     navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
-   } else {
-     api.get('') // GERAR ID DO USUARIO
-   }
+   //if (formData.id) {
+   //  navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
+   //} else {
+   //  api.get('') // GERAR ID DO USUARIO
+   //}
   };
 
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
