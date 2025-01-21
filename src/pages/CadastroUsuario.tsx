@@ -9,13 +9,12 @@ import api from '../service/api';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
-  id: string;
+  id?: string;
   initialData?: User;
 }
 
-const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id }) => {
+const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
   let user = {
-  id: id,
   nome: '',
   cpf: '',
   rg: '',
@@ -33,15 +32,18 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
     energia: '',
     bens: '',
     internet: false,
-    acesso: '',
+    CRAS: false,
+    acessoCRAS: false,
+    chaveCRAS:  '',
+    senhaCRAS: '',
     descDoenca: '',
     medicamentos: '',
     medicamentosGasto: NaN,
     tratamento: '',
-    nutri: '',
+    nutri: false,
     tempoTratamento: '',
     local: '',
-    encaminhamento: '',
+    encaminhamento: ''
   },
   responsavel: {
     nome: '',
@@ -79,12 +81,16 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
 //Carrega formData do sessionStorage na montagem  
   useEffect(() => {
     const storedFormData = sessionStorage.getItem('formData');
-    if (storedFormData) {
-      let formdata = JSON.parse(storedFormData)
-      setFormData(formdata as User);
-      console.log(formData)
+    try{
+      if (storedFormData) {
+        let formdata = JSON.parse(storedFormData)
+        setFormData(formdata as User);
+        console.log(formData)
+      }
     }
-    console.log('CARREGOU')
+    catch (error){
+
+    }
   }, []); 
 
 //Salva formData no sessionStorage sempre que formData mudar
@@ -100,10 +106,8 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
     const isComplete = 
       formData.nome.trim() !== '' &&
       formData.cpf.trim() !== '' &&
-      formData.rg.trim() !== '' &&
       formData.data !== undefined &&
       formData.telefone.trim() !== '' &&
-      formData.profissao.trim() !== '' &&
       !isNaN(formData.escolaridade) &&
       formData.patologia.trim() !== '';
 
@@ -289,7 +293,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData, id })
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
             disabled={!isFormComplete}
           >
-            <Link to={'/adicionar-dados/' + formData.id} className='w-max'>Adicionar Dados</Link>
+            <Link to={'/adicionar-dados'} className='w-max'>Adicionar Dados</Link>
           </Button>
           <Button
             type="primary"

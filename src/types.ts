@@ -1,7 +1,7 @@
 
 
 export interface User {
-    id: string;
+    id?: string;
     nome: string;
     cpf: string;
     rg: string;
@@ -46,12 +46,7 @@ export interface Familiar {
 }
 export const escolaridades = ['Ensino Fundamental incompleto','Ensino Fundamental completo','Ensino Medio incompleto','Ensino Medio completo','Ensino Superior incompleto','Ensino Superior completo']
 
-export interface CRAS {
-  cras: boolean;
-  acesso: boolean;
-  chave: string;
-  senha: string;
-}
+
 
 export interface DadosUsuario {
   familiares?: Familiar[];
@@ -62,13 +57,15 @@ export interface DadosUsuario {
   energia: string;
   bens: string;
   internet: boolean;
-  CRAS?: CRAS;
-  acesso: string;
+  CRAS: boolean;
+  acessoCRAS?: boolean;
+  chaveCRAS?: string;
+  senhaCRAS?: string;
   descDoenca: string;
   medicamentos: string;
   medicamentosGasto: number;
   tratamento: string;
-  nutri: string;
+  nutri: boolean;
   tempoTratamento: string;
   local: string;
   encaminhamento: string;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DadosUsuario, Familiar, CRAS, escolaridades } from '../types';
+import { DadosUsuario, Familiar, escolaridades } from '../types';
 import type { CheckboxProps } from 'antd';
 import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
@@ -10,7 +10,6 @@ const { TextArea } = Input;
 
 const AdicionarDados: React.FC = () => {
   
-  const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
   const [dados, setDados] = useState<DadosUsuario>({
     fonteRenda: '',
@@ -20,18 +19,63 @@ const AdicionarDados: React.FC = () => {
     energia: '',
     bens: '',
     internet: false,
-    acesso: '',
+    CRAS: false,
+    acessoCRAS: false,
+    chaveCRAS:  '',
+    senhaCRAS: '',
     descDoenca: '',
     medicamentos: '',
     medicamentosGasto: NaN,
     tratamento: '',
-    nutri: '',
+    nutri: false,
     tempoTratamento: '',
     local: '',
     encaminhamento: ''
   });
 
+  const [isFormComplete, setIsFormComplete] = useState(false);
   const navigate = useNavigate();
+  const [isMounted, setIsMounted] = useState(false); // Estado para controlar a montagem
+
+  // Carrega formData do sessionStorage na montagem
+  useEffect(() => {
+    const storedFormData = sessionStorage.getItem('formData');
+    if (storedFormData) {
+      const formData = JSON.parse(storedFormData);
+      setDados(formData.dados);
+      console.log('Dados carregados:', formData);
+      console.log('Dados carregados DADOS:', formData.dados);
+    }
+    setIsMounted(true); // Define como montado após carregar os dados
+  }, []);
+
+  // Salva formData no sessionStorage sempre que formData mudar, mas só depois da montagem
+  useEffect(() => {
+    if (isMounted) { // Só executa se o componente já foi montado
+      const storedFormData = sessionStorage.getItem('formData') || '{}';
+      const formData = JSON.parse(storedFormData);
+      formData.dados = dados;
+      sessionStorage.setItem('formData', JSON.stringify(formData));
+      console.log('Salvando dados:', formData);
+    }
+  }, [dados, isMounted]);
+
+  // Verifica se o formulário está completo toda vez que formData mudar
+  useEffect(() => {
+    const isComplete =
+      dados.fonteRenda.trim() !== '' &&
+      !isNaN(dados.valorRenda) &&
+      dados.moradia.trim() !== '' &&
+      dados.agua.trim() !== '' &&
+      dados.energia.trim() !== '' &&
+      dados.bens.trim() !== '' &&
+      dados.descDoenca.trim() !== '' &&
+      dados.medicamentos.trim() !== '' &&
+      !isNaN(dados.medicamentosGasto) &&
+      dados.local.trim() !== '';
+
+    setIsFormComplete(isComplete);
+  }, [dados]);
 
 
 //Familiares
@@ -98,33 +142,62 @@ const AdicionarDados: React.FC = () => {
 
 //CRAS
   const [isCRAS, setIsCRAS] = useState(false)
-  const [isAcesso, setIsAcesso] = useState(false)
+  const [isAcessoCRAS, setIsAcessoCRAS] = useState(false)
   var acessoVisibility = isCRAS ? '' : 'hidden'
-  var CrasLoginVisibility = isAcesso ? '' : 'hidden'
+  var CrasLoginVisibility = isAcessoCRAS ? '' : 'hidden'
   
   const toggleCRAS: CheckboxProps['onChange'] = (e) => {
     setIsCRAS(e.target.checked)
+    setDados({
+      ...dados,
+      CRAS: e.target.checked,
+    });
   }
-  const toggleAcesso: CheckboxProps['onChange'] = (e) => {
-    setIsAcesso(e.target.checked)
-
+  const toggleAcessoCRAS: CheckboxProps['onChange'] = (e) => {
+    setIsAcessoCRAS(e.target.checked)
+    setDados({
+      ...dados,
+      acessoCRAS: e.target.checked,
+    });
+    
   }
 
 
 // SN SIM OU NAO
-  const [isNet, setIsNet] = useState(false)
-  const [isNutri, setIsNutri] = useState(false)
-  const toggleNet: CheckboxProps['onChange'] = (e) => {
-    setIsNet(e.target.checked)
-  }
-  const toggleNutri: CheckboxProps['onChange'] = (e) => {
-    setIsNutri(e.target.checked)
-  }
+const [isNet, setIsNet] = useState(false);
+const [isNutri, setIsNutri] = useState(false);
+
+const toggleNet: CheckboxProps['onChange'] = (e) => {
+  setIsNet(e.target.checked);
+  setDados({
+    ...dados,
+    internet: e.target.checked
+  });
+};
+
+const toggleNutri: CheckboxProps['onChange'] = (e) => {
+  setIsNutri(e.target.checked);
+  setDados({
+    ...dados,
+    nutri: e.target.checked
+  });
+};
   var SNnet = isNet ? 'Sim' : 'Não'
   var SNnutri = isNutri  ? 'Sim' : 'Não'
   var SNcras = isCRAS ? 'Sim' : 'Não'
-  var SNacesso = isAcesso ? 'Sim' : 'Não'
+  var SNacessoCRAS = isAcessoCRAS ? 'Sim' : 'Não'
 
+
+//TRATAMENTO
+const handleTratamentoChange = (tratamento: string, checked: boolean) => {
+  setDados((prevState) => {
+    const tratamentosAtuais = prevState.tratamento ? prevState.tratamento.split(', ') : [];
+    const novosTratamentos = checked
+      ? [...tratamentosAtuais, tratamento]
+      : tratamentosAtuais.filter((t) => t !== tratamento);
+    return { ...prevState, tratamento: novosTratamentos.join(', ') };
+  });
+};
 
 
 
@@ -151,7 +224,7 @@ const AdicionarDados: React.FC = () => {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-center">
-        Adicionar Dados para o Usuário {id}
+        Adicionar Dados para o Usuário
       </h1>
       <div className="max-w-3xl mx-auto mb-10 bg-white p-6 rounded-lg shadow-md ">
         <div className='button p-4'>
@@ -165,6 +238,7 @@ const AdicionarDados: React.FC = () => {
             <label className="text-lg">Fonte de renda familiar</label>
             <Select
               placeholder="Fonte de Renda"
+              value={dados.fonteRenda || undefined} 
               onChange={(value) => handleSelectChange('fonteRenda', value)}
               className="w-full"
               options={[
@@ -198,10 +272,11 @@ const AdicionarDados: React.FC = () => {
             <label className="text-lg">Tipo de Moradia</label>
             <Select
               placeholder="Fonte de Renda"
-              onChange={(value) => handleSelectChange('fonteRenda', value)}
+              onChange={(value) => handleSelectChange('moradia', value)}
               className="w-full"
+              value={dados.moradia || undefined} 
               options={[
-                { value: 'própria', label: 'Casa própria' },
+                { value: 'propria', label: 'Casa própria' },
                 { value: 'alugada', label: 'Casa alugada' },
                 { value: 'cedida', label: 'Casa cedida' },
                 { value: 'financiada', label: 'Casa financiada' },
@@ -216,6 +291,7 @@ const AdicionarDados: React.FC = () => {
               placeholder="Tipo de Abastecimento de Água"
               onChange={(value) => handleSelectChange('agua', value)}
               className="w-full"
+              value={dados.agua || undefined} 
               options={[
                 { value: 'publica', label: 'rede pública' },
                 { value: 'poco', label: 'poço ou nascente' },
@@ -231,6 +307,7 @@ const AdicionarDados: React.FC = () => {
               placeholder="Tipo de Abastecimento de Energia"
               onChange={(value) => handleSelectChange('energia', value)}
               className="w-full"
+              value={dados.energia || undefined} 
               options={[
                 { value: 'celesc', label: 'celesc' },
                 { value: 'cooperativa', label: 'cooperativa' },
@@ -255,15 +332,23 @@ const AdicionarDados: React.FC = () => {
           <div className="flex flex-col">
             <label className="text-lg">CRAS</label>
               <Checkbox checked={isCRAS} onChange={toggleCRAS}>Usuário é acompanhado pelo CRAS? {SNcras}</Checkbox>
-              <Checkbox checked={isAcesso} onChange={toggleAcesso} className={acessoVisibility}>Usuário tem acesso ao sistema do CRAS? {SNacesso}</Checkbox>
+              <Checkbox checked={isAcessoCRAS} onChange={toggleAcessoCRAS} className={acessoVisibility}>Usuário tem acesso ao sistema do CRAS? {SNacessoCRAS}</Checkbox>
               <div className={'' + CrasLoginVisibility}>
                 <div>
                   <label className='text-lg'>Chave</label>
-                  <Input placeholder='Chave'></Input>
+                  <Input name="chaveCRAS"
+                    placeholder="Chave"
+                    value={dados.chaveCRAS}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div>
                   <label className='text-lg'>Senha</label>
-                  <Input.Password placeholder='Senha' iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)} ></Input.Password>
+                  <Input name="senhaCRAS"
+                      placeholder="Senha"
+                      value={dados.senhaCRAS}
+                      onChange={handleInputChange}
+                    />
                 </div>
               </div>
           </div>
@@ -277,10 +362,11 @@ const AdicionarDados: React.FC = () => {
           {/* Doenças */}
           <div className="flex flex-col">
             <label className="text-lg">Descrição da Doença</label>
-            <TextArea
+            <Input
               name="descDoenca"
               placeholder="Descrição da Doença"
               value={dados.descDoenca}
+              onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
           </div>
@@ -313,9 +399,20 @@ const AdicionarDados: React.FC = () => {
           {/* Tratamento */}
           <div className="flex flex-col">
             <label className="text-lg">Tratamento Médico</label>
-            <Checkbox>Quimioterapia</Checkbox>
-            <Checkbox>Radioterapia</Checkbox>
-            <Checkbox>Acompanhamento paliativo</Checkbox>
+            <Checkbox
+            onChange={(e) => handleTratamentoChange('quimioterapia', e.target.checked)}>
+              Quimioterapia
+            </Checkbox>
+            
+            <Checkbox
+            onChange={(e) => handleTratamentoChange('radioterapia', e.target.checked)}>
+              Radioterapia
+            </Checkbox>
+            
+            <Checkbox
+            onChange={(e) => handleTratamentoChange('acompanhamento paliativo', e.target.checked)}>
+              Acompanhamento paliativo
+            </Checkbox>
           </div>
 
           {/* Nutrição */}
@@ -398,7 +495,8 @@ const AdicionarDados: React.FC = () => {
           </div>
 
           {/* Botão de Envio */}
-          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded">
+          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded"
+          disabled={!isFormComplete}>
             Enviar Dados
           </Button>
         </form>

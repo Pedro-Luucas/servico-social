@@ -6,17 +6,14 @@ import AdicionarDados from './pages/AdicionarDados';
 import UserList from './components/UserList';
 import { v4 as uuidv4 } from 'uuid';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import * as dotenv from 'dotenv'
 
-
-dotenv.config();
 const router = createBrowserRouter([
   {
     path: '/cadastro-usuario',
     element: <CadastroUsuario onSubmit={() => {}} id={'teste'} initialData={undefined} />
   },
   {
-    path: '/adicionar-dados/:id',
+    path: '/adicionar-dados',
     element: <AdicionarDados />
   },
   {
