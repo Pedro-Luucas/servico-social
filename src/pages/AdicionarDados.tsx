@@ -5,6 +5,7 @@ import type { CheckboxProps } from 'antd';
 import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import FamiliarModal from '../components/FamiliarModal';
+import { useCheckbox } from '../components/useCheckbox';
 
 const { TextArea } = Input;
 
@@ -140,64 +141,109 @@ const AdicionarDados: React.FC = () => {
   
 
 
-//CRAS
-  const [isCRAS, setIsCRAS] = useState(false)
-  const [isAcessoCRAS, setIsAcessoCRAS] = useState(false)
-  var acessoVisibility = isCRAS ? '' : 'hidden'
-  var CrasLoginVisibility = isAcessoCRAS ? '' : 'hidden'
+//------------------------------------CHECKBOXES------------------------------------
+
+  const { checked: isCRAS, toggle: toggleCRAS, setChecked: setIsCRAS } = useCheckbox({
+    initialState: dados.CRAS,
+    onChange: (newValue) => {
+      setDados(prev => ({
+        ...prev,
+        CRAS: newValue
+      }));
+    }
+  });
+  const { checked: isAcessoCRAS, toggle: toggleAcessoCRAS, setChecked: setIsAcessoCRAS } = useCheckbox({
+    initialState: dados.acessoCRAS,
+    onChange: (newValue) => {
+      setDados(prev => ({
+        ...prev,
+        acessoCRAS: newValue
+      }));
+    }
+  });
+  const { checked: isNet, toggle: toggleNet, setChecked: setIsNet } = useCheckbox({
+    initialState: dados.internet,
+    onChange: (newValue) => {
+      setDados(prev => ({
+        ...prev,
+        internet: newValue
+      }));
+    }
+  });
+  const { checked: isNutri, toggle: toggleNutri, setChecked: setIsNutri } = useCheckbox({
+    initialState: dados.nutri,
+    onChange: (newValue) => {
+      setDados(prev => ({
+        ...prev,
+        nutri: newValue
+      }));
+    }
+  });
+
+//TRATAMENTO
+  const tratamentos = [
+    'quimioterapia', 
+    'radioterapia', 
+    'acompanhamento paliativo'
+  ];
   
-  const toggleCRAS: CheckboxProps['onChange'] = (e) => {
-    setIsCRAS(e.target.checked)
-    setDados({
-      ...dados,
-      CRAS: e.target.checked,
-    });
-  }
-  const toggleAcessoCRAS: CheckboxProps['onChange'] = (e) => {
-    setIsAcessoCRAS(e.target.checked)
-    setDados({
-      ...dados,
-      acessoCRAS: e.target.checked,
-    });
-    
-  }
+  const tratamentoCheckboxes = tratamentos.map(tratamento => 
+    useCheckbox({
+      onChange: (checked) => {
+        handleTratamentoChange(tratamento, checked);
+      }
+    })
+  );
 
+  var acessoVisibility = isCRAS ? '' : 'hidden'
+  var CrasLoginVisibility = (isAcessoCRAS && isCRAS) ? '' : 'hidden'
 
-// SN SIM OU NAO
-const [isNet, setIsNet] = useState(false);
-const [isNutri, setIsNutri] = useState(false);
-
-const toggleNet: CheckboxProps['onChange'] = (e) => {
-  setIsNet(e.target.checked);
-  setDados({
-    ...dados,
-    internet: e.target.checked
-  });
-};
-
-const toggleNutri: CheckboxProps['onChange'] = (e) => {
-  setIsNutri(e.target.checked);
-  setDados({
-    ...dados,
-    nutri: e.target.checked
-  });
-};
   var SNnet = isNet ? 'Sim' : 'Não'
   var SNnutri = isNutri  ? 'Sim' : 'Não'
   var SNcras = isCRAS ? 'Sim' : 'Não'
   var SNacessoCRAS = isAcessoCRAS ? 'Sim' : 'Não'
 
 
-//TRATAMENTO
-const handleTratamentoChange = (tratamento: string, checked: boolean) => {
-  setDados((prevState) => {
-    const tratamentosAtuais = prevState.tratamento ? prevState.tratamento.split(', ') : [];
-    const novosTratamentos = checked
-      ? [...tratamentosAtuais, tratamento]
-      : tratamentosAtuais.filter((t) => t !== tratamento);
-    return { ...prevState, tratamento: novosTratamentos.join(', ') };
-  });
-};
+
+  const handleTratamentoChange = (tratamento: string, checked: boolean) => {
+    setDados((prevState) => {
+      const tratamentosAtuais = prevState.tratamento 
+        ? prevState.tratamento.split(', ').filter(t => t.trim() !== '')
+        : [];
+
+      const novosTratamentos = checked
+        ? [...tratamentosAtuais, tratamento]
+        : tratamentosAtuais.filter((t) => t !== tratamento);
+
+      return { 
+        ...prevState, 
+        tratamento: novosTratamentos.length > 0 
+          ? novosTratamentos.join(', ') 
+          : '' 
+      };
+    });
+  };
+
+//useEffect para checar as chekboxers
+  useEffect(() => {
+    // CRAS
+    setIsCRAS(dados.CRAS || false);
+    
+    // Access CRAS
+    setIsAcessoCRAS(dados.acessoCRAS || false);
+    
+    // Internet
+    setIsNet(dados.internet || false);
+    
+    // Nutrição
+    setIsNutri(dados.nutri || false);
+    
+    // Treatments
+    tratamentoCheckboxes.forEach((checkbox, index) => {
+      const isChecked = dados.tratamento?.split(', ').includes(tratamentos[index]);
+      checkbox.setChecked(isChecked);
+    });
+  }, [dados]);
 
 
 
@@ -356,7 +402,7 @@ const handleTratamentoChange = (tratamento: string, checked: boolean) => {
           {/* Acesso */}
           <div className="flex flex-col">
             <label className="text-lg">Acesso a internet</label>
-            <Checkbox onChange={toggleNet}>Usuário possui acesso a internet? {SNnet}</Checkbox>
+            <Checkbox checked={isNet} onChange={toggleNet}>Usuário possui acesso a internet? {SNnet}</Checkbox>
           </div>
 
           {/* Doenças */}
@@ -399,26 +445,21 @@ const handleTratamentoChange = (tratamento: string, checked: boolean) => {
           {/* Tratamento */}
           <div className="flex flex-col">
             <label className="text-lg">Tratamento Médico</label>
-            <Checkbox
-            onChange={(e) => handleTratamentoChange('quimioterapia', e.target.checked)}>
-              Quimioterapia
-            </Checkbox>
-            
-            <Checkbox
-            onChange={(e) => handleTratamentoChange('radioterapia', e.target.checked)}>
-              Radioterapia
-            </Checkbox>
-            
-            <Checkbox
-            onChange={(e) => handleTratamentoChange('acompanhamento paliativo', e.target.checked)}>
-              Acompanhamento paliativo
-            </Checkbox>
+            {tratamentos.map((tratamento, index) => (
+              <Checkbox
+                key={tratamento}
+                checked={tratamentoCheckboxes[index].checked}
+                onChange={tratamentoCheckboxes[index].toggle}
+              >
+                {tratamento.charAt(0).toUpperCase() + tratamento.slice(1)}
+              </Checkbox>
+            ))}
           </div>
 
           {/* Nutrição */}
           <div className="flex flex-col">
             <label className="text-lg">Nutrição</label>
-              <Checkbox onChange={toggleNutri}>Usuário tem dieta da nutricionista? {SNnutri}</Checkbox>
+              <Checkbox checked={isNutri} onChange={toggleNutri}>Usuário tem dieta da nutricionista? {SNnutri}</Checkbox>
           </div>
 
           {/* Tempo de Tratamento */}
