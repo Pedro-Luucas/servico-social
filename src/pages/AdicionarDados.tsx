@@ -6,6 +6,7 @@ import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import FamiliarModal from '../components/FamiliarModal';
 import { useCheckbox } from '../components/useCheckbox';
+import { submitUsuario } from '../components/submitUsuario';
 
 const { TextArea } = Input;
 
@@ -261,9 +262,14 @@ const AdicionarDados: React.FC = () => {
     navigate('/cadastro-usuario')
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados do Usuário:', dados);
+    try {
+      const result = await submitUsuario();
+      // Handle successful submission
+    } catch (error) {
+      // Handle error
+    }
   };
 
 
@@ -537,7 +543,7 @@ const AdicionarDados: React.FC = () => {
 
           {/* Botão de Envio */}
           <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded"
-          disabled={!isFormComplete}>
+          disabled={!isFormComplete} onClick={submitUsuario}>
             Enviar Dados
           </Button>
         </form>
