@@ -1,8 +1,8 @@
-import React from 'react';
 import api from '../service/api';
 
-export const submitUsuario = async () => {
+const submitUsuario = async () => {
   try {
+    // Recupera o formData do sessionStorage
     const formDataString = sessionStorage.getItem('formData');
     if (!formDataString) {
       throw new Error('No form data found in sessionStorage');
@@ -10,54 +10,59 @@ export const submitUsuario = async () => {
 
     const formData = JSON.parse(formDataString);
 
+    // Transforma o formData no formato do requestBody
     const requestBody = {
       nome: formData.nome,
       ativo: formData.ativo,
-      cpf: formData.cpf ,
-      rg: formData.rg || formData.cpf,
-      dataNasc: formData.dataNasc,
+      cpf: formData.cpf,
+      rg: formData.rg || null,
+      dataNasc: formData.data,
       telefone: formData.telefone,
-      profissao: formData.profissao || '',
+      profissao: formData.profissao || null,
       escolaridade: formData.escolaridade,
-      patologia: formData.patologia ,
-
-      CEP: formData.endereco.CEP || '', 
-      municipio: formData.endereco.municipio || '', 
-      bairro: formData.endereco.bairro || '', 
-      rua: formData.endereco.rua || '', 
-      numero: formData.numero || '', 
-      referencia: formData.endereco.referencia || '', 
-      
-      // Responsavel
-      respNome: formData.responsavel?.nome || '',
-      respCpf: formData.responsavel?.cpf || '',
-      respIdade: formData.responsavel?.idade || 0,
-      respTelefone: formData.responsavel?.telefone || '',
-      respProfissao: formData.responsavel?.profissao || '',
-      respEscolaridade: formData.responsavel?.escolaridade || '',
-      respParentesco: formData.responsavel?.parentesco || '',
-      
-      
-      
-      // Convert some fields to appropriate types
-      valorRenda: parseFloat(formData.dados.valorRenda) || 0.0,
-      medicamentosGasto: parseFloat(formData.dados.medicamentosGasto) || 0.0,
-      
-      // Rename some keys to match the expected format
-      acessoCRAS: formData.dados.acessoCRAS || '',
-      chaveCRAS: formData.dados.chaveCRAS || '',
-      senhaCRAS: formData.dados.senhaCRAS || '',
-      descDoenca: formData.dados.descDoenca || '',
-      encaminhamento: formData.dados.encaminhamento || '',
-      local: formData.dados.local || '',
-      tratamento: formData.dados.tratamento || '',
-      tempoTratamento: formData.dados.tempoTratamento || ''
+      patologia: formData.patologia,
+      cep: formData.endereco.CEP,
+      municipio: formData.endereco.municipio,
+      bairro: formData.endereco.bairro,
+      rua: formData.endereco.rua,
+      numero: formData.endereco.numero,
+      referencia: formData.endereco.referencia || null,
+      respNome: formData.responsavel.nome || null,
+      respCpf: formData.responsavel.cpf || null,
+      respIdade: formData.responsavel.idade || null,
+      respTelefone: formData.responsavel.telefone || null,
+      respProfissao: formData.responsavel.profissao || null,
+      respEscolaridade: formData.responsavel.escolaridade || null,
+      respParentesco: formData.responsavel.parentesco || null,
+      fonteRenda: formData.dados.fonteRenda,
+      valorRenda: parseFloat(formData.dados.valorRenda) || null,
+      moradia: formData.dados.moradia,
+      agua: formData.dados.agua,
+      energia: formData.dados.energia,
+      bens: formData.dados.bens,
+      internet: formData.dados.internet,
+      cras: formData.dados.CRAS,
+      acessoCRAS: formData.dados.acessoCRAS,
+      chaveCRAS: formData.dados.chaveCRAS || null,
+      senhaCRAS: formData.dados.senhaCRAS || null,
+      descDoenca: formData.dados.descDoenca,
+      medicamentos: formData.dados.medicamentos,
+      medicamentosGasto: parseFloat(formData.dados.medicamentosGasto) || 0,
+      tratamento: formData.dados.tratamento,
+      nutri: formData.dados.nutri,
+      tempoTratamento: formData.dados.tempoTratamento,
+      local: formData.dados.local,
+      encaminhamento: formData.dados.encaminhamento,
     };
 
+    // Faz a requisição POST para o endpoint "usuarios"
     const response = await api.post('usuarios', requestBody);
+    console.log('foi: ', response)
     return response.data;
   } catch (error) {
     console.error('Full Error:', error);
     throw error;
   }
 };
+
+export { submitUsuario };

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Responsavel, User, Endereco, escolaridades } from '../types';
 import EnderecoModal from '../components/EnderecoModal';
-import { DatePicker, Input, Select, Button, Radio } from "antd";
+import { DatePicker, Input, Select, Button, Radio, Modal } from "antd";
 import type { RadioChangeEvent } from 'antd';
 import { Link } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 import api from '../service/api';
+import { LeftOutlined } from '@ant-design/icons';
+import { useNavigate } from "react-router";
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
@@ -14,6 +16,7 @@ interface UserFormProps {
 }
 
 const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
+  let navigate = useNavigate();
   let user = {
   nome: '',
   cpf: '',
@@ -65,7 +68,8 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
 //HOOKS
   const [formData, setFormData] = useState<User>(user);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModalExit, setShowModalExit] = useState(false);
+  const [showModalEndereco, setShowModalEndereco] = useState(false);
   const [endereco, setEndereco] = useState<Endereco | undefined>(formData.endereco);
   const [ativo, setAtivo] = useState(formData.ativo);
   const [escolaridade, setEscolaridade] = useState(formData.escolaridade);
@@ -114,7 +118,14 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     setIsFormComplete(isComplete);
   }, [formData]);
 
+//MODAL DE AVISO
+  const backHome = () => {
+    setShowModalExit(false)
+    navigate("/")
+  }
 
+//MODAL DO RESPONSAVEL
+  const [showModalResponsavel, setShowModalResponsavel] = useState(false);
 
 
   
@@ -154,7 +165,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
     setEndereco(enderecoData);
     setFormData({ ...formData, endereco: enderecoData });
-    setShowModal(false);
+    setShowModalEndereco(false);
     console.log(formData.endereco)
   };
 
@@ -170,6 +181,10 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
       <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-center">Serviço Social</h1>
       <h1 className="md:text-2xl font-bold mb-4 md:mb-4 text-center">Cadastrar Usuário</h1>
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div className="flex flex-row justify-between mx-8">
+          <h2></h2>
+          <Button icon={<LeftOutlined />} onClick={() => {setShowModalExit(true)}} className='self-start' />
+        </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Nome */}
@@ -277,6 +292,14 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
 
           {/* Ativo Inativo ou Obito */}
           <div className='md:col-span-2 my-5'>
+          <Button
+            type="primary"
+            htmlType="button"
+            onClick={() => setShowModalEndereco(true)}
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded my-3"
+          >
+            Adicionar Responsavel
+          </Button>
             <h1 className='text-2xl md:text-2xl font-bold mb-2 md:mb-4 text-center'>Situação do Usuário</h1>
             <Radio.Group onChange={handleAtivo} value={ativo} block size='large'>
               <Radio value={0}>Ativo</Radio>
@@ -298,20 +321,30 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           <Button
             type="primary"
             htmlType="button"
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowModalEndereco(true)}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
           >
             Adicionar Endereço
           </Button>
         </form>
 
-        {showModal && (
+        {showModalEndereco && (
           <EnderecoModal
-            onClose={() => setShowModal(false)}
+            onClose={() => setShowModalEndereco(false)}
             onSave={handleEnderecoSubmit}
             initialData={endereco}
           />
         )}
+        <Modal
+        title="Voltar à pagina inicial?"
+        open={showModalExit}
+        onOk={backHome}
+        onCancel={() => {setShowModalExit(false)}}
+        okText="Ok"
+        cancelText="Cancelar"
+      >
+        <h1>As alterações não serão salvas! </h1>
+      </Modal>
       </div>
     </div>
   );

@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "antd";
 
 const Home: React.FC = () => {
+  useEffect(() => {
+    sessionStorage.removeItem("formData");
+  })
+
   const navigate = useNavigate();
 
   const handleCadastroClick = () => {
-    navigate('/cadastroUsuario'); // Navega para a página de cadastro
+    navigate('/cadastro-usuario'); // Navega para a página de cadastro
   };
 
   const handlePesquisarClick = () => {

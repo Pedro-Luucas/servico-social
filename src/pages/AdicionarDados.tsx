@@ -6,7 +6,8 @@ import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
 import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import FamiliarModal from '../components/FamiliarModal';
 import { useCheckbox } from '../components/useCheckbox';
-import { submitUsuario } from '../components/submitUsuario';
+// @ts-ignore
+import { submitUsuario } from "../components/submitUsuario";
 
 const { TextArea } = Input;
 
@@ -83,7 +84,7 @@ const AdicionarDados: React.FC = () => {
 //Familiares
   
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModalFamiliar, setShowModal] = useState(false);
   const [showModalConfirm, setShowModalConfirm] = useState(false);
 
   const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
@@ -249,6 +250,13 @@ const AdicionarDados: React.FC = () => {
 
 
 //HANDLE AS COISA
+  //modal de aviso
+  const [showModalExit, setShowModalExit] = useState(false);
+  const backHome = () => {
+    setShowModalExit(false)
+    navigate("/")
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setDados({ ...dados, [name]: value });
@@ -266,7 +274,6 @@ const AdicionarDados: React.FC = () => {
     e.preventDefault();
     try {
       const result = await submitUsuario();
-      // Handle successful submission
     } catch (error) {
       // Handle error
     }
@@ -279,9 +286,11 @@ const AdicionarDados: React.FC = () => {
         Adicionar Dados para o Usuário
       </h1>
       <div className="max-w-3xl mx-auto mb-10 bg-white p-6 rounded-lg shadow-md ">
-        <div className='button p-4'>
+        <div className="flex flex-row justify-between mx-8">
           <Button type='text' icon={<LeftOutlined />} onClick={handleVoltar} />
+          <Button icon={<CloseOutlined />} onClick={() => {setShowModalExit(true)}} className='self-start' />
         </div>
+        
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -543,11 +552,11 @@ const AdicionarDados: React.FC = () => {
 
           {/* Botão de Envio */}
           <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded"
-          disabled={!isFormComplete} onClick={submitUsuario}>
+          disabled={!isFormComplete} onClick={handleSubmit}>
             Enviar Dados
           </Button>
         </form>
-        {showModal && (
+        {showModalFamiliar && (
           <FamiliarModal
             initialData={familiarToEdit}
             onClose={() => setShowModal(false)}
@@ -565,6 +574,17 @@ const AdicionarDados: React.FC = () => {
                     </>
                   )}
                   />
+
+            <Modal
+                  title="Voltar à pagina inicial?"
+                  open={showModalExit}
+                  onOk={backHome}
+                  onCancel={() => {setShowModalExit(false)}}
+                  okText="Ok"
+                  cancelText="Cancelar"
+                >
+                  <h1>As alterações não serão salvas! </h1>
+            </Modal>
         {/*showModalEdit && (
           <FamiliarModal
             
