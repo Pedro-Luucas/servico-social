@@ -6,8 +6,17 @@ import AdicionarDados from './pages/AdicionarDados';
 import UserList from './components/UserList';
 import { v4 as uuidv4 } from 'uuid';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import PesquisaUsuario from './pages/PesquisaUsuario';
 
 const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home/>
+  },
+  {
+    path: '/pesquisa',
+    element: <PesquisaUsuario/>
+  },
   {
     path: '/cadastro-usuario',
     element: <CadastroUsuario onSubmit={() => {}} id={'teste'} initialData={undefined} />
@@ -16,10 +25,7 @@ const router = createBrowserRouter([
     path: '/adicionar-dados',
     element: <AdicionarDados />
   },
-  {
-    path: '/',
-    element: <Home/>
-  },
+  
   ]);
 
 const App: React.FC = () => {
