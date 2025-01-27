@@ -154,14 +154,6 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     setFormData({...formData, ativo: e.target.value})
   }
 
-  const handleAdicionarDados = () => {
-   //if (formData.id) {
-   //  navigate(`/adicionar-dados/${formData.id}`); // Redireciona para a rota com o ID do usuário
-   //} else {
-   //  api.get('') // GERAR ID DO USUARIO
-   //}
-  };
-
   const handleEnderecoSubmit = (enderecoData: Endereco) => {
     setEndereco(enderecoData);
     setFormData({ ...formData, endereco: enderecoData });
@@ -312,7 +304,6 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           <Button
             type="primary"
             htmlType="button"
-            onClick={handleAdicionarDados}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
             disabled={!isFormComplete}
           >

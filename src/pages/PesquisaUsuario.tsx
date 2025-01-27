@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Input, Select, Card, Typography, List, Alert } from 'antd';
+import { Button, Input, Select, Card, Typography, List, Alert, Modal } from 'antd';
 import { pesquisar } from '../service/pesquisar';
 import { escolaridades, User } from '../types';
-import { EditOutlined } from '@ant-design/icons';
+import { EditOutlined, LeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
 
@@ -12,7 +13,9 @@ const PesquisaUsuario: React.FC = () => {
   const [responseData, setResponseData] = useState<any>(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showModalExit, setShowModalExit] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  let navigate = useNavigate();
 
   const handleSearch = async () => {
     setLoading(true);
@@ -31,6 +34,12 @@ const PesquisaUsuario: React.FC = () => {
   else{
     setVisible(false)
   }};
+
+//MODAL DE AVISO
+  const backHome = () => {
+    setShowModalExit(false)
+    navigate("/")
+  }
 
   const renderResults = () => {
     if (loading) return <Text type="secondary">Carregando...</Text>;
@@ -75,6 +84,10 @@ const PesquisaUsuario: React.FC = () => {
     <div className="flex h-screen">
       {/* Left Sidebar */}
       <div className="w-1/3 bg-gray-100 p-8 shadow-lg fixed h-full">
+      <div className="flex flex-row justify-between mx-8">
+          <h2></h2>
+          <Button icon={<LeftOutlined />} onClick={() => {setShowModalExit(true)}} className='self-start' />
+        </div>
         <h1 className="text-2xl font-bold mb-6 text-center">Pesquisa de Usuário</h1>
         <div className="space-y-4">
           <div>
@@ -120,6 +133,16 @@ const PesquisaUsuario: React.FC = () => {
       <div className="ml-[33%] w-2/3 bg-white flex items-start justify-center p-8 overflow-y-auto h-screen">
         <div className="w-full">{renderResults()}</div>
       </div>
+      <Modal
+        title="Voltar à pagina inicial?"
+        open={showModalExit}
+        onOk={backHome}
+        onCancel={() => {setShowModalExit(false)}}
+        okText="Ok"
+        cancelText="Cancelar"
+      >
+        <h1>As alterações não serão salvas! </h1>
+      </Modal>
     </div>
   );
 };
