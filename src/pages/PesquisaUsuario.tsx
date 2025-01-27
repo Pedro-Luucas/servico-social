@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Input, Select, Card, Typography, List, Alert, Modal } from 'antd';
 import { pesquisar } from '../service/pesquisar';
 import { escolaridades, User } from '../types';
-import { EditOutlined, LeftOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
@@ -11,29 +11,37 @@ const PesquisaUsuario: React.FC = () => {
   const [search, setSearch] = useState('');
   const [tipoPesquisa, setTipoPesquisa] = useState('nome');
   const [responseData, setResponseData] = useState<any>(null);
-  const [visible, setVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showModalExit, setShowModalExit] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   let navigate = useNavigate();
 
   const handleSearch = async () => {
     setLoading(true);
     setError(null);
-    if(search.length >3){
-    try {
-      const data = await pesquisar(tipoPesquisa, search);
-      setResponseData(data);
-    } catch (err) {
-      setError('Erro ao buscar dados');
-      console.error(err);
-    } finally {
+    if (search.length > 2) {
+      try {
+        const data = await pesquisar(tipoPesquisa, search);
+        setResponseData(data);
+      } catch (err: any) {
+        if (err.message === 'Nenhum resultado encontrado para a pesquisa.') {
+          setError(err.message);
+        } else {
+          setError('Erro ao buscar dados. Tente novamente mais tarde.');
+        }
+        console.error(err);
+      } finally {
+        setAlertVisible(false);
+        setLoading(false);
+      }
+    } else {
+      setAlertVisible(true);
       setLoading(false);
     }
-  }
-  else{
-    setVisible(false)
-  }};
+  };
 
 //MODAL DE AVISO
   const backHome = () => {
@@ -41,10 +49,16 @@ const PesquisaUsuario: React.FC = () => {
     navigate("/")
   }
 
+//DETALHES USUARIO
+  //const detalhes = (id) => {
+    //AQUI
+  //}
+
   const renderResults = () => {
     if (loading) return <Text type="secondary">Carregando...</Text>;
     if (error) return <Text type="danger">{error}</Text>;
     if (!responseData) return <Text type="secondary">Realize uma pesquisa para exibir resultados</Text>;
+    const ativo = ['ATIVO', 'INATIVO', 'OBITO']
 
     return (
       <div className='md:col-span-2'>
@@ -64,14 +78,18 @@ const PesquisaUsuario: React.FC = () => {
                 title={u.nome}
                 extra={
                   <div>
-                    <Button type='text' icon={<EditOutlined />} className='ml-1' />
+                    <Button type='text' icon={<EyeOutlined />} onClick={() => {}} className='ml-1' />
+                    <Button type='text' icon={<EditOutlined />} onClick={() => {console.log(u)}}className='ml-1' />
                   </div>
                 }
               >
+                <p>{ativo[u.ativo]}</p>
+                
                 <p>{u.cpf}</p>
                 <p>{u.telefone}</p>
                 <p>{escolaridades[u.escolaridade]}</p>
                 <p>{u.endereco?.CEP}</p>
+                <p>...</p>
               </Card>
             </List.Item>
           )}
@@ -99,8 +117,8 @@ const PesquisaUsuario: React.FC = () => {
               placeholder={tipoPesquisa}
               className="w-full"
             />
-            {visible && (
-              <Alert message="No mínimo 3 caracteres! " type="error" closable afterClose={()=>{setVisible(false)}}/>
+            {alertVisible && (
+              <Alert message="No mínimo 3 caracteres! " type="error" closable afterClose={()=>{setAlertVisible(false)}}/>
             )}
           </div>
 

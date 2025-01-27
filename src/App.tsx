@@ -7,6 +7,7 @@ import UserList from './components/UserList';
 import { v4 as uuidv4 } from 'uuid';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import PesquisaUsuario from './pages/PesquisaUsuario';
+import DetalhesUsuario from './pages/DetalhesUsuario';
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path: '/adicionar-dados',
     element: <AdicionarDados />
+  },
+  {
+    path: '/detalhes/:id',
+    element: <DetalhesUsuario />
   },
   
   ]);

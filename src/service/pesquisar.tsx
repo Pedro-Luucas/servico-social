@@ -5,7 +5,8 @@ export const pesquisar = async (tipo: string, query: string) => {
     nome: 'usuarios/pesquisarNome',
     telefone: 'usuarios/pesquisarTelefone',
     cpf: 'usuarios/pesquisarCpf',
-    cep: 'usuarios/pesquisarCep'
+    cep: 'usuarios/pesquisarCep',
+    id: 'usuarios/pesquisarId'
   };
 
   const endpoint = endpoints[tipo];
@@ -16,7 +17,10 @@ export const pesquisar = async (tipo: string, query: string) => {
   try {
     const response = await api.get(`${endpoint}?${tipo}=${query}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      throw new Error('Nenhum resultado encontrado para a pesquisa.');
+    }
     console.error('Erro na pesquisa:', error);
     throw error;
   }
