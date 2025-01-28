@@ -8,6 +8,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import api from '../service/api';
 import { LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router";
+import ResponsavelModal from '../components/ResponsavelModal';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
@@ -52,7 +53,6 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     nome: '',
     cpf: '',
     idade: NaN,
-    endereco: undefined,
     telefone: '',
     profissao: '',
     escolaridade: NaN,
@@ -71,6 +71,8 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   const [showModalExit, setShowModalExit] = useState(false);
   const [showModalEndereco, setShowModalEndereco] = useState(false);
   const [endereco, setEndereco] = useState<Endereco | undefined>(formData.endereco);
+  const [showModalResponsavel, setShowModalResponsavel] = useState(false);
+  const [responsavel, setResponsavel] = useState<Responsavel | undefined>(formData.responsavel);
   const [ativo, setAtivo] = useState(formData.ativo);
   const [escolaridade, setEscolaridade] = useState(formData.escolaridade);
   const [isFormComplete, setIsFormComplete] = useState(false);
@@ -124,9 +126,6 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     navigate("/")
   }
 
-//MODAL DO RESPONSAVEL
-  const [showModalResponsavel, setShowModalResponsavel] = useState(false);
-
 
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +158,13 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     setFormData({ ...formData, endereco: enderecoData });
     setShowModalEndereco(false);
     console.log(formData.endereco)
+  };
+
+  const handleResponsavelSubmit = (responsavelData: Responsavel) => {
+    setResponsavel(responsavelData);
+    setFormData({ ...formData, responsavel: responsavelData });
+    setShowModalResponsavel(false);
+    console.log(formData.responsavel)
   };
 
 
@@ -287,7 +293,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           <Button
             type="primary"
             htmlType="button"
-            onClick={() => setShowModalEndereco(true)}
+            onClick={() => setShowModalResponsavel(true)}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded my-3"
           >
             Adicionar Responsavel
@@ -319,13 +325,18 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           </Button>
         </form>
 
-        {showModalEndereco && (
-          <EnderecoModal
-            onClose={() => setShowModalEndereco(false)}
-            onSave={handleEnderecoSubmit}
-            initialData={endereco}
-          />
-        )}
+        <EnderecoModal
+          open={showModalEndereco}
+          onClose={() => setShowModalEndereco(false)}
+          onSave={handleEnderecoSubmit}
+          initialData={endereco}
+        />
+        <ResponsavelModal
+          open={showModalResponsavel}
+          onClose={() => setShowModalResponsavel(false)}
+          onSave={handleResponsavelSubmit}
+          initialData={responsavel}
+        />
         <Modal
         title="Voltar à pagina inicial?"
         open={showModalExit}

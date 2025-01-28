@@ -269,13 +269,25 @@ const AdicionarDados: React.FC = () => {
   const handleVoltar = () => {
     navigate('/cadastro-usuario')
   };
+//SUBMIT---------------------
+
+  const [showModalSubmit, setShowModalSubmit] = useState(false);
+
+  const openModalSubmit = () => {
+    setShowModalSubmit(true)
+  }
+  const closeModalSubmit = () => {
+    setShowModalSubmit(false)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const result = await submitUsuario();
+      setShowModalSubmit(false)
+      //EDITAR USUARIOOOO
     } catch (error) {
-      // Handle error
+      console.log(error)
     }
   };
 
@@ -507,6 +519,7 @@ const AdicionarDados: React.FC = () => {
             <Input
               name="encaminhamento"
               placeholder="Encaminhamento"
+              value={dados.encaminhamento}
               onChange={handleInputChange}
               className="border rounded p-2 w-full text-lg"
             />
@@ -552,7 +565,7 @@ const AdicionarDados: React.FC = () => {
 
           {/* Botão de Envio */}
           <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded"
-          disabled={!isFormComplete} onClick={handleSubmit}>
+          disabled={!isFormComplete} onClick={openModalSubmit}>
             Enviar Dados
           </Button>
         </form>
@@ -584,6 +597,17 @@ const AdicionarDados: React.FC = () => {
                   cancelText="Cancelar"
                 >
                   <h1>As alterações não serão salvas! </h1>
+            </Modal>
+
+            <Modal
+              title="Confirmar Envio"
+              open={showModalSubmit}
+              onOk={()=>{handleSubmit}}
+              onCancel={closeModalSubmit}
+              okText="Confirmar"
+              cancelText="Cancelar"
+            >
+              <p>Tem certeza de que deseja enviar os dados?</p>
             </Modal>
         {/*showModalEdit && (
           <FamiliarModal

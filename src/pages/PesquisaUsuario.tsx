@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Input, Select, Card, Typography, List, Alert, Modal } from 'antd';
 import { pesquisar } from '../service/pesquisar';
-import { escolaridades, User } from '../types';
+import { escolaridades, User, UsuarioDTO } from '../types';
 import { EditOutlined, EyeOutlined, LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { transformFrontToDTO, transformDTOToFront } from '../components/transformUser'
 
 const { Text } = Typography;
 
@@ -13,11 +14,20 @@ const PesquisaUsuario: React.FC = () => {
   const [responseData, setResponseData] = useState<any>(null);
   const [alertVisible, setAlertVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showModalExit, setShowModalExit] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   let navigate = useNavigate();
+
+  useEffect(() => {
+    const query = sessionStorage.getItem('searchQuery')
+    if(query){
+      setSearch(query)
+    }
+  },[])
+  
+  useEffect(() => {
+    sessionStorage.setItem('searchQuery', search)
+  },[search])
+  
 
   const handleSearch = async () => {
     setLoading(true);
@@ -45,14 +55,32 @@ const PesquisaUsuario: React.FC = () => {
 
 //MODAL DE AVISO
   const backHome = () => {
-    setShowModalExit(false)
+    sessionStorage.removeItem('searchQuery')
     navigate("/")
   }
 
 //DETALHES USUARIO
-  //const detalhes = (id) => {
-    //AQUI
-  //}
+  const detalhes = (id: string | undefined) => {
+    if(id){
+    navigate("/detalhes/"+id)
+    }
+  }
+  
+  const editarUsuario = (userBack: UsuarioDTO) => {
+    if(userBack){
+      sessionStorage.setItem('edit', 'true')
+      const userFront = transformDTOToFront(userBack)
+      sessionStorage.setItem('formData', JSON.stringify(userFront))
+
+      console.log('USUARIO DA FUNCAO: ',userBack)
+      const usu = sessionStorage.getItem('formData')
+      if(usu){
+        console.log('USUARIO NO FORMDATA: ',JSON.parse(usu))
+      }
+
+      navigate('/cadastro-usuario')
+    }
+  }
 
   const renderResults = () => {
     if (loading) return <Text type="secondary">Carregando...</Text>;
@@ -72,14 +100,14 @@ const PesquisaUsuario: React.FC = () => {
             lg: 4,
           }}
           dataSource={responseData}
-          renderItem={(u: User) => (
+          renderItem={(u: UsuarioDTO) => (
             <List.Item>
               <Card
                 title={u.nome}
                 extra={
                   <div>
-                    <Button type='text' icon={<EyeOutlined />} onClick={() => {}} className='ml-1' />
-                    <Button type='text' icon={<EditOutlined />} onClick={() => {console.log(u)}}className='ml-1' />
+                    <Button type='text' icon={<EyeOutlined />} onClick={() => {detalhes(u.id)}} className='ml-1' />
+                    <Button type='text' icon={<EditOutlined />} onClick={() => {editarUsuario(u)}}className='ml-1' />
                   </div>
                 }
               >
@@ -88,7 +116,7 @@ const PesquisaUsuario: React.FC = () => {
                 <p>{u.cpf}</p>
                 <p>{u.telefone}</p>
                 <p>{escolaridades[u.escolaridade]}</p>
-                <p>{u.endereco?.CEP}</p>
+                <p>{u.CEP}</p>
                 <p>...</p>
               </Card>
             </List.Item>
@@ -104,7 +132,7 @@ const PesquisaUsuario: React.FC = () => {
       <div className="w-1/3 bg-gray-100 p-8 shadow-lg fixed h-full">
       <div className="flex flex-row justify-between mx-8">
           <h2></h2>
-          <Button icon={<LeftOutlined />} onClick={() => {setShowModalExit(true)}} className='self-start' />
+          <Button icon={<LeftOutlined />} onClick={backHome} className='self-start' />
         </div>
         <h1 className="text-2xl font-bold mb-6 text-center">Pesquisa de Usuário</h1>
         <div className="space-y-4">
@@ -151,16 +179,6 @@ const PesquisaUsuario: React.FC = () => {
       <div className="ml-[33%] w-2/3 bg-white flex items-start justify-center p-8 overflow-y-auto h-screen">
         <div className="w-full">{renderResults()}</div>
       </div>
-      <Modal
-        title="Voltar à pagina inicial?"
-        open={showModalExit}
-        onOk={backHome}
-        onCancel={() => {setShowModalExit(false)}}
-        okText="Ok"
-        cancelText="Cancelar"
-      >
-        <h1>As alterações não serão salvas! </h1>
-      </Modal>
     </div>
   );
 };

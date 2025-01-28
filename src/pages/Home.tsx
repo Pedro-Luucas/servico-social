@@ -5,6 +5,7 @@ import { Button } from "antd";
 const Home: React.FC = () => {
   useEffect(() => {
     sessionStorage.removeItem("formData");
+    sessionStorage.setItem('edit', 'false')
   })
 
   const navigate = useNavigate();

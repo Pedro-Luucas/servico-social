@@ -20,7 +20,8 @@ const DetalhesUsuario = () => {
         { key: 'cpf', label: 'CPF' },
         { key: 'rg', label: 'RG' },
         { key: 'dataNasc', label: 'Data de Nascimento' },
-        { key: 'telefone', label: 'Telefone' }
+        { key: 'telefone', label: 'Telefone' },
+        { key: 'patologia', label: 'Patologia' }
       ]
     },
     {
@@ -34,31 +35,37 @@ const DetalhesUsuario = () => {
       ]
     },
     {
-      title: 'Profissional',
-      fields: [
-        { key: 'profissao', label: 'Profissão' },
-        { key: 'escolaridade', label: 'Escolaridade' },
-        { key: 'patologia', label: 'Patologia' }
-      ]
-    },
-    {
       title: 'Responsável',
       fields: [
-        { key: 'respNome', label: 'Nome' },
-        { key: 'respCpf', label: 'CPF' },
-        { key: 'respIdade', label: 'Idade' },
-        { key: 'respTelefone', label: 'Telefone' },
-        { key: 'respProfissao', label: 'Profissão' }
+        { key: 'respNome', label: 'Nome do responsavel' },
+        { key: 'respCpf', label: 'CPF do responsavel' },
+        { key: 'respIdade', label: 'Idade do responsavel' },
+        { key: 'respTelefone', label: 'Telefone do responsavel' },
+        { key: 'respProfissao', label: 'Profissão do responsavel' },
+        { key: 'respParentesco', label: 'Parentesco'}
       ]
     },
     {
       title: 'Financeiro',
       fields: [
+        { key: 'profissao', label: 'Profissão' },
+        { key: 'escolaridade', label: 'Escolaridade' },
+        
         { key: 'fonteRenda', label: 'Fonte de Renda' },
-        { key: 'valorRenda', label: 'Valor da Renda' },
-        { key: 'moradia', label: 'Moradia' },
-        { key: 'agua', label: 'Água' },
-        { key: 'energia', label: 'Energia' }
+        { key: 'valorRenda', label: 'Valor da Renda' }
+      ]
+    },
+    {
+      title: 'Tratamento',
+      fields: [
+        
+        { key: 'tratamento', label: 'Tratamento' },
+        
+        { key: 'tempoTratamento', label: 'Duração do Tratamento' },
+        { key: 'local', label: 'Local do tratamento' },
+        { key: 'encaminhamento', label: 'Encaminhamento' },
+        
+        
       ]
     },
     {
@@ -67,19 +74,27 @@ const DetalhesUsuario = () => {
         { key: 'descDoenca', label: 'Descrição da Doença' },
         { key: 'medicamentos', label: 'Medicamentos' },
         { key: 'medicamentosGasto', label: 'Gasto com Medicamentos' },
-        { key: 'tratamento', label: 'Tratamento' },
-        { key: 'tempoTratamento', label: 'Duração do Tratamento' }
       ]
     },
     {
-      title: 'Informações Adicionais',
+      title: 'Acesso',
       fields: [
         { key: 'internet', label: 'Internet' },
-        { key: 'acessoCRAS', label: 'Acesso ao CRAS' },
-        { key: 'chaveCRAS', label: 'Chave do CRAS' },
-        { key: 'local', label: 'Local' },
-        { key: 'encaminhamento', label: 'Encaminhamento' }
+        { key: 'agua', label: 'Água' },
+        { key: 'energia', label: 'Energia' },
+        { key: 'moradia', label: 'Moradia' }
       ]
+      
+    },
+    {
+      title: 'CRAS',
+      fields: [
+        { key: 'cras', label: 'CRAS' },
+        { key: 'acessoCRAS', label: 'Acesso ao sistema do CRAS' },
+        { key: 'chaveCRAS', label: 'Chave do CRAS' },
+        { key: 'senhaCRAS', label: 'senha do CRAS' },
+      ]
+      
     }
   ];
 
@@ -112,6 +127,8 @@ const DetalhesUsuario = () => {
         <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-bold">Detalhes do Usuário</h2>
               <div className="self-start">
+                {/* ATIVO INATIVO OU ÓBITO */}
+
                   {/* Botão para voltar */}
               <Button
                 icon={<LeftOutlined />}
