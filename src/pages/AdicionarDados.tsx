@@ -8,6 +8,8 @@ import FamiliarModal from '../components/FamiliarModal';
 import { useCheckbox } from '../components/useCheckbox';
 // @ts-ignore
 import { submitUsuario } from "../components/submitUsuario";
+// @ts-ignore
+import { editUsuario } from '../components/editUsuario';
 
 const { TextArea } = Input;
 
@@ -271,25 +273,36 @@ const AdicionarDados: React.FC = () => {
   };
 //SUBMIT---------------------
 
-  const [showModalSubmit, setShowModalSubmit] = useState(false);
+const [showModalSubmit, setShowModalSubmit] = useState(false);
 
-  const openModalSubmit = () => {
-    setShowModalSubmit(true)
-  }
-  const closeModalSubmit = () => {
-    setShowModalSubmit(false)
-  }
+const openModalSubmit = () => {
+  setShowModalSubmit(true);
+};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
+const closeModalSubmit = () => {
+  setShowModalSubmit(false);
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const isEditing = sessionStorage.getItem("edit") === "true";
+    
+    if (isEditing) {
+      const result = await editUsuario();
+      setShowModalSubmit(false);
+      navigate('/pesquisa')
+    } else {
       const result = await submitUsuario();
-      setShowModalSubmit(false)
-      //EDITAR USUARIOOOO
-    } catch (error) {
-      console.log(error)
+      setShowModalSubmit(false);
+      navigate('/')
     }
-  };
+    
+  } catch (error) {
+    console.error("Error submitting/editing user:", error);
+    // You might want to show an error message to the user here
+  }
+};
 
 
   return (
@@ -600,14 +613,14 @@ const AdicionarDados: React.FC = () => {
             </Modal>
 
             <Modal
-              title="Confirmar Envio"
+              title={sessionStorage.getItem("edit") === "true" ? "Editar dados" : "Enviar dados"}
               open={showModalSubmit}
-              onOk={()=>{handleSubmit}}
+              onOk={handleSubmit}
               onCancel={closeModalSubmit}
               okText="Confirmar"
               cancelText="Cancelar"
             >
-              <p>Tem certeza de que deseja enviar os dados?</p>
+              <p>Tem certeza de que deseja {sessionStorage.getItem("edit") === "true" ? "editar" : "enviar"} os dados?</p>
             </Modal>
         {/*showModalEdit && (
           <FamiliarModal

@@ -56,7 +56,7 @@ const editUsuario = async () => {
     };
 
     // Faz a requisição POST para o endpoint "usuarios"
-    const response = await api.put(`usuarios/edit/${formData.id}`, requestBody);
+    const response = await api.put(`usuarios/editar/${formData.id}`, requestBody);
     console.log('foi: ', response)
     return response.data;
   } catch (error) {

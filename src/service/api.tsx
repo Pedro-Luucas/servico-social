@@ -9,10 +9,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    config.auth = {
-      username: process.env.REACT_APP_API_USERNAME || 'pedrao',
-      password: process.env.REACT_APP_API_PASSWORD || '123'
-    }
     console.log('Request Config:', config)
     return config
   },
