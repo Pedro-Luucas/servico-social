@@ -137,7 +137,7 @@ const PesquisaUsuario: React.FC = () => {
         <h1 className="text-2xl font-bold mb-6 text-center">Pesquisa de Usuário</h1>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm mb-2">Pesquisar Usuário</label>
+            <label className="block text-sm mb-2">Pesquisar</label>
             <Input
               type="text"
               value={search}

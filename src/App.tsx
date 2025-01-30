@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { User } from './types';
 import CadastroUsuario from './pages/CadastroUsuario';
 import Home from './pages/Home';
@@ -12,66 +12,53 @@ import axios from 'axios';
 import api from './service/api';
 import CadastrarNovoOperador from './pages/CadastrarNovoOperador';
 
-
-
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home/>
+    element: <Home />,
   },
   {
     path: '/pesquisa',
-    element: <PesquisaUsuario/>
+    element: <PesquisaUsuario />,
   },
   {
     path: '/cadastro-usuario',
-    element: <CadastroUsuario onSubmit={() => {}}/>
+    element: <CadastroUsuario onSubmit={() => {}} />,
   },
   {
     path: '/adicionar-dados',
-    element: <AdicionarDados />
+    element: <AdicionarDados />,
   },
   {
     path: '/detalhes/:id',
-    element: <DetalhesUsuario />
+    element: <DetalhesUsuario />,
   },
   {
     path: '/cadastrarnovooperador',
-    element: <CadastrarNovoOperador />
+    element: <CadastrarNovoOperador />,
   },
-  
-  ]);
-
-
-  const Login = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [error, setError] = useState('');
-  
-    useEffect(() => {
-      // Try to authenticate immediately when component mounts
-      checkAuth();
-    }, []);
-  
-    const checkAuth = async () => {
-      try {
-        // This request will trigger the browser's auth dialog
-        const response = await api.get('operadores/auth-check', {
-          // This is important - it tells axios to trigger the browser auth dialog
-          withCredentials: true
-        });
-        
-        setIsAuthenticated(true);
-        console.log(response)
-      } catch (err) {
-        console.log('ERRO',err)
-        setIsAuthenticated(false);
-      }
-    }};
+]);
 
 const App: React.FC = () => {
-  Login()
-  return <RouterProvider router={router} />;
+  // Authentication check (runs only once when the app mounts)
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Make a request to the auth-check endpoint
+        await api.get('operadores/auth-check', {
+          withCredentials: true, // Ensures credentials are sent
+        });
+        console.log('Authenticated successfully');
+      } catch (err) {
+        // If the server returns a 401, the browser will show the login dialog
+        console.error('Authentication error:', err);
+      }
+    };
 
+    checkAuth(); // Trigger the authentication check
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;
