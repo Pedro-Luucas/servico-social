@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { DadosUsuario, Familiar, escolaridades } from '../types';
-import type { CheckboxProps } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { DadosUsuario } from '../types';
 import { Input, Select, Checkbox, Button, List, Card, Modal } from 'antd';
-import { LeftOutlined, EyeInvisibleOutlined, EyeOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
-import FamiliarModal from '../components/FamiliarModal';
+import { LeftOutlined, CloseOutlined } from '@ant-design/icons';
 import { useCheckbox } from '../components/useCheckbox';
 // @ts-ignore
 import { submitUsuario } from "../components/submitUsuario";
@@ -83,66 +81,6 @@ const AdicionarDados: React.FC = () => {
   }, [dados]);
 
 
-//Familiares
-  
-
-  const [showModalFamiliar, setShowModal] = useState(false);
-  const [showModalConfirm, setShowModalConfirm] = useState(false);
-
-  const [familiarToEdit, setFamiliarToEdit] = useState<Familiar | null>(null);
-  const [familiarToDelete, setFamiliarToDelete] = useState<Familiar | null>(null);
-  
- //ADICIONAR FAMILIAR
-  const handleFamiliarSubmit = (familiarData: Familiar) => {
-    setDados((prevState) => {
-      const familiares = prevState.familiares || [];
-
-      // Verifica se está editando um familiar
-      if (familiarToEdit) {
-        // Atualiza o familiar editado
-        const updatedFamiliares = familiares.map((f) =>
-          f.nome === familiarToEdit.nome ? familiarData : f
-        );
-        return { ...prevState, familiares: updatedFamiliares };
-      } else {
-        // Adiciona um novo familiar
-        return { ...prevState, familiares: [...familiares, familiarData] };
-      }
-    });
-
-    setShowModal(false); // Fecha o modal após salvar
-    setFamiliarToEdit(null); // Limpa o familiar a ser editado
-  };
-
-
- // EDITAR FAMILIAR
-  const handleEditFamiliar = (familiarData: Familiar) => {
-    setFamiliarToEdit(familiarData); // Define o familiar a ser editado
-    setShowModal(true); // Abre o modal para edição
-  };
-
- // DELETAR FAMILIAR
-  const handleDeleteFamiliar = (fToDelete: Familiar) => {
-    setFamiliarToDelete(fToDelete)
-    setShowModalConfirm(true)
-  }
-
-  const deleteFamiliar = () => {
-    // Filtra os familiares pra deletar o familiarToDelete com essa gambiarra de operador ternario pq o TS nao para de apitar
-    const updatedFamiliares = dados.familiares ? dados.familiares.filter(f => f !== familiarToDelete) : dados.familiares;
-    
-    // Atualiza o estado com a nova lista de familiares
-    setDados({
-      ...dados,
-      familiares: updatedFamiliares,
-    });
-    closeModalConfirm()
-  };
-
-  const closeModalConfirm = () => {
-    setShowModalConfirm(false)
-  }
-  
 
 
 //------------------------------------CHECKBOXES------------------------------------
@@ -289,12 +227,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     const isEditing = sessionStorage.getItem("edit") === "true";
     
     if (isEditing) {
-      const result = await editUsuario();
       setShowModalSubmit(false);
+      const result = await editUsuario();
       navigate('/pesquisa')
     } else {
-      const result = await submitUsuario();
       setShowModalSubmit(false);
+      const result = await submitUsuario();
       navigate('/')
     }
     
@@ -538,68 +476,13 @@ const handleSubmit = async (e: React.FormEvent) => {
             />
           </div>
 
-          <Button
-            type="primary" htmlType="button"
-            color="default" variant="filled"
-            onClick={() => setShowModal(true)} 
-            className="md:col-span-2 bg-blue-500 mt-3 p-2 md:p-4 w-full text-lg rounded"
-          >
-            Adicionar Familiar
-          </Button>
-
-          <div className='md:col-span-2'>
-            <h1 className='text-2xl md:text-2xl font-bold mb-2 md:mb-4 text-center'>Familiares</h1>
-              <List
-                grid={{
-                  gutter: 14,
-                  xs: 1,
-                  sm: 2,
-                  md: 4,
-                  lg: 4,
-                }}
-                dataSource={dados.familiares}
-                renderItem={(f) => (
-                  <List.Item>
-                    <Card title={f.nome} extra={
-                        <div>
-                          <Button type='text' icon={<EditOutlined />} onClick={() => {handleEditFamiliar(f)}} className='ml-1' />
-                          <Button type='text' icon={<CloseOutlined />} onClick={() => {handleDeleteFamiliar(f)}} />
-                          </div>}>
-                      <p>{f.parentesco}</p>
-                      <p>{f.idade} anos</p>
-                      <p>{escolaridades[f.escolaridade]}</p>
-                      <p>{f.profissao}</p>
-                      <p>{f.salario}</p>
-                    </Card>
-                  </List.Item>
-                )}
-              />
-          </div>
-
           {/* Botão de Envio */}
-          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-2 md:p-4 w-full text-lg rounded"
+          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-3 md:p-6 w-full text-lg rounded mt-5"
           disabled={!isFormComplete} onClick={openModalSubmit}>
             Enviar Dados
           </Button>
         </form>
-        {showModalFamiliar && (
-          <FamiliarModal
-            initialData={familiarToEdit}
-            onClose={() => setShowModal(false)}
-            onSave={handleFamiliarSubmit}
-          />)}
-                <Modal
-                  open={showModalConfirm}
-                  title={"Deseja deletar o familiar?"}
-                  onOk={deleteFamiliar}
-                  onCancel={closeModalConfirm}
-                  footer={(_, { OkBtn, CancelBtn }) => (
-                    <>
-                      <CancelBtn />
-                      <OkBtn />
-                    </>
-                  )}
-                  />
+     
 
             <Modal
                   title="Voltar à pagina inicial?"
@@ -622,12 +505,6 @@ const handleSubmit = async (e: React.FormEvent) => {
             >
               <p>Tem certeza de que deseja {sessionStorage.getItem("edit") === "true" ? "editar" : "enviar"} os dados?</p>
             </Modal>
-        {/*showModalEdit && (
-          <FamiliarModal
-            
-            onClose={() => setShowModalEdit(false)}
-            onSave={handleFamiliarSubmit}
-          />)*/}
       
       </div>
     </div>

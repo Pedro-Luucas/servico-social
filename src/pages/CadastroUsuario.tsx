@@ -1,36 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { Responsavel, User, Endereco, escolaridades } from '../types';
-import EnderecoModal from '../components/EnderecoModal';
+import React, { useEffect, useState, useCallback } from 'react';
 import { DatePicker, Input, Select, Button, Radio, Modal } from "antd";
 import type { RadioChangeEvent } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
-import api from '../service/api';
 import { LeftOutlined } from '@ant-design/icons';
-import { useNavigate } from "react-router";
+import EnderecoModal from '../components/EnderecoModal';
 import ResponsavelModal from '../components/ResponsavelModal';
+import { Responsavel, User, Endereco } from '../types';
+import api from '../service/api';
 
 interface UserFormProps {
   onSubmit: (user: User) => void;
-  id?: string;
   initialData?: User;
 }
 
-const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
-  let navigate = useNavigate();
-  let user = {
+const initialUserState: User = {
   nome: '',
   cpf: '',
   rg: '',
   data: undefined,
   telefone: '',
   profissao: '',
-  escolaridade: NaN,
+  escolaridade: 0,
   endereco: undefined,
   patologia: '',
   dados: {
     fonteRenda: '',
-    valorRenda: NaN,
+    valorRenda: 0,
     moradia: '',
     agua: '',
     energia: '',
@@ -38,11 +34,11 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
     internet: false,
     CRAS: false,
     acessoCRAS: false,
-    chaveCRAS:  '',
+    chaveCRAS: '',
     senhaCRAS: '',
     descDoenca: '',
     medicamentos: '',
-    medicamentosGasto: NaN,
+    medicamentosGasto: 0,
     tratamento: '',
     nutri: false,
     tempoTratamento: '',
@@ -52,273 +48,173 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   responsavel: {
     nome: '',
     cpf: '',
-    idade: NaN,
+    idade: 0,
     telefone: '',
     profissao: '',
-    escolaridade: NaN,
+    escolaridade: 0,
     parentesco: '',
   },
   ativo: 1,
-}
-  const storedFormData = sessionStorage.getItem('formData'); 
-  if(storedFormData){
-    user = JSON.parse(storedFormData)
-  }
+};
 
-//HOOKS
-  const [formData, setFormData] = useState<User>(user);
+const escolaridadeOptions = [
+  { value: 0, label: 'Ensino fundamental incompleto' },
+  { value: 1, label: 'Ensino fundamental completo' },
+  { value: 2, label: 'Ensino médio incompleto' },
+  { value: 3, label: 'Ensino médio completo' },
+  { value: 4, label: 'Ensino superior incompleto' },
+  { value: 5, label: 'Ensino superior completo' },
+];
 
-  const [showModalExit, setShowModalExit] = useState(false);
-  const [showModalEndereco, setShowModalEndereco] = useState(false);
-  const [endereco, setEndereco] = useState<Endereco | undefined>(formData.endereco);
-  const [showModalResponsavel, setShowModalResponsavel] = useState(false);
-  const [responsavel, setResponsavel] = useState<Responsavel | undefined>(formData.responsavel);
-  const [ativo, setAtivo] = useState(formData.ativo);
-  const [escolaridade, setEscolaridade] = useState(formData.escolaridade);
-  const [isFormComplete, setIsFormComplete] = useState(false);
-
-  let aniversario: dayjs.Dayjs | undefined = undefined;
-  if (typeof formData.data === 'string' && formData.data.trim() !== '') {
-    aniversario = dayjs(formData.data);
-  }
-  
-  const [dataNasc, setDataNasc] = useState<dayjs.Dayjs | undefined>(aniversario);
-
-//Carrega formData do sessionStorage na montagem  
-  useEffect(() => {
-    const storedFormData = sessionStorage.getItem('formData');
-    try{
-      if (storedFormData) {
-        let formdata = JSON.parse(storedFormData)
-        setFormData(formdata as User);
-        console.log(formData)
-      }
+const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<User>(() => {
+    try {
+      const storedData = sessionStorage.getItem('formData');
+      return storedData ? JSON.parse(storedData) : initialData || initialUserState;
+    } catch {
+      return initialData || initialUserState;
     }
-    catch (error){
+  });
 
-    }
-  }, []); 
+  const [showModals, setShowModals] = useState({
+    exit: false,
+    endereco: false,
+    responsavel: false,
+  });
 
-//Salva formData no sessionStorage sempre que formData mudar
+  const [dataNasc, setDataNasc] = useState<Dayjs | undefined>(
+    formData.data ? dayjs(formData.data) : undefined
+  );
+
+  const handleToggleModal = useCallback((modal: keyof typeof showModals, value: boolean) => {
+    setShowModals(prev => ({ ...prev, [modal]: value }));
+  }, []);
+
   useEffect(() => {
-    const storedFormData = sessionStorage.getItem('formData');
     sessionStorage.setItem('formData', JSON.stringify(formData));
-    if(storedFormData){
-    console.log('SALVANDO: ',JSON.parse(storedFormData))}
   }, [formData]);
 
-//Verifica se o formulário está completo toda vez que formData mudar
-  useEffect(() => {
-    const isComplete = 
-      formData.nome.trim() !== '' &&
-      formData.cpf.trim() !== '' &&
-      formData.data !== undefined &&
-      formData.telefone.trim() !== '' &&
-      !isNaN(formData.escolaridade) &&
-      formData.patologia.trim() !== '';
+  const isFormComplete = Boolean(
+    formData.nome.trim() &&
+    formData.cpf.trim() &&
+    formData.data &&
+    formData.telefone.trim() &&
+    formData.escolaridade !== undefined &&
+    formData.patologia.trim() &&
+    formData.endereco?.CEP?.trim() &&
+    formData.responsavel.nome.trim()
+  );
 
-    setIsFormComplete(isComplete);
-  }, [formData]);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
-//MODAL DE AVISO
-  const backHome = () => {
-    setShowModalExit(false)
-    navigate("/")
-  }
+  const handleDate = useCallback((date: Dayjs | null) => {
+    if (!date) return;
+    setDataNasc(date);
+    setFormData(prev => ({ ...prev, data: date.toISOString() }));
+  }, []);
 
+  const handleSelectChange = useCallback((name: keyof User, value: unknown) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEnderecoSubmit = useCallback((enderecoData: Endereco) => {
+    setFormData(prev => ({ ...prev, endereco: enderecoData }));
+    handleToggleModal('endereco', false);
+  }, [handleToggleModal]);
 
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleResponsavelSubmit = useCallback((responsavelData: Responsavel) => {
+    setFormData(prev => ({ ...prev, responsavel: responsavelData }));
+    handleToggleModal('responsavel', false);
+  }, [handleToggleModal]);
 
-  const handleDate = (data: Dayjs | null) => {
-    if (data) {
-      setDataNasc(data);
-      setFormData({ ...formData, data: data.toISOString() });
-    }
-  };
+  const renderField = (label: string, name: keyof User, required = false) => (
+    <div className="flex flex-col">
+      <label className="text-lg">{label}{required && '*'}</label>
+      <Input
+        name={name}
+        value={formData[name] as string}
+        onChange={handleChange}
+        className="border rounded p-2 md:p-4 w-full text-lg"
+      />
+    </div>
 
-  const handleEscolaridade = (escolaridadeN: number) => {
-    if (escolaridadeN) {
-      setEscolaridade(escolaridadeN)
-      setFormData({ ...formData, escolaridade: escolaridadeN })
-      
-    }
-  };
-
-  const handleAtivo = (e: RadioChangeEvent) => {
-    setAtivo(e.target.value)
-    setFormData({...formData, ativo: e.target.value})
-  }
-
-  const handleEnderecoSubmit = (enderecoData: Endereco) => {
-    setEndereco(enderecoData);
-    setFormData({ ...formData, endereco: enderecoData });
-    setShowModalEndereco(false);
-    console.log(formData.endereco)
-  };
-
-  const handleResponsavelSubmit = (responsavelData: Responsavel) => {
-    setResponsavel(responsavelData);
-    setFormData({ ...formData, responsavel: responsavelData });
-    setShowModalResponsavel(false);
-    console.log(formData.responsavel)
-  };
-
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-
-  return (
+    
+  );return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8 text-center">Serviço Social</h1>
       <h1 className="md:text-2xl font-bold mb-4 md:mb-4 text-center">Cadastrar Usuário</h1>
+      
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <div className="flex flex-row justify-between mx-8">
-          <h2></h2>
-          <Button icon={<LeftOutlined />} onClick={() => {setShowModalExit(true)}} className='self-start' />
+        <div className="flex justify-between mx-8">
+          <Button icon={<LeftOutlined />} onClick={() => handleToggleModal('exit', true)} />
         </div>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          {/* Nome */}
+        <form onSubmit={e => { e.preventDefault(); onSubmit(formData); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {renderField('Nome', 'nome', true)}
+          {renderField('Telefone', 'telefone', true)}
+          {renderField('RG', 'rg')}
+          
           <div className="flex flex-col">
-            <label className="text-lg">Nome</label>
-            <Input
-              name="nome"
-              placeholder="Nome"
-              value={formData.nome}
-              onChange={handleChange}
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
-
-          {/* Telefone */}
-          <div className="flex flex-col">
-            <label className="text-lg">Telefone</label>
-            <Input
-              name="telefone"
-              placeholder="Telefone"
-              value={formData.telefone}
-              onChange={handleChange}
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
-
-          {/* RG */}
-          <div className="flex flex-col">
-            <label className="text-lg">RG</label>
-            <Input
-              name="rg"
-              placeholder="RG"
-              value={formData.rg}
-              onChange={handleChange}
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
-
-          {/* Data de nascimento */}
-          <div className="flex flex-col">
-            <label className="text-lg">Data de nascimento</label>
+            <label className="text-lg">Data de nascimento*</label>
             <DatePicker
-              name="data"
-              placeholder="Data de nascimento"
               value={dataNasc}
-              onChange={(value) => handleDate(value)}
-              className="border rounded p-2 md:p-4 w-full text-lg"
+              onChange={handleDate}
+              className="w-full text-lg"
+              popupClassName="date-picker-dropdown"
             />
           </div>
 
-          {/* CPF */}
-          <div className="flex flex-col">
-            <label className="text-lg">CPF</label>
-            <Input
-              name="cpf"
-              placeholder="CPF"
-              value={formData.cpf}
-              onChange={handleChange}
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
+          {renderField('CPF', 'cpf', true)}
+          {renderField('Profissão', 'profissao')}
 
-          {/* Profissão */}
           <div className="flex flex-col">
-            <label className="text-lg">Profissão</label>
-            <Input
-              name="profissao"
-              placeholder="Profissão"
-              value={formData.profissao}
-              onChange={handleChange}
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
-
-          {/* Escolaridade */}
-          <div className="flex flex-col">
-            <label className="text-lg">Escolaridade</label>
+            <label className="text-lg">Escolaridade*</label>
             <Select
-              placeholder="Escolaridade"
-              onChange={handleEscolaridade}
-              value={escolaridade}
-              className="w-full size-full text-lg"
-              options={[
-                { value: 0, label: 'Ensino fundamental incompleto' },
-                { value: 1, label: 'Ensino fundamental completo' },
-                { value: 2, label: 'Ensino médio incompleto' },
-                { value: 3, label: 'Ensino médio completo' },
-                { value: 4, label: 'Ensino superior incompleto' },
-                { value: 5, label: 'Ensino superior completo' },
-              ]}
+              value={formData.escolaridade}
+              onChange={v => handleSelectChange('escolaridade', v)}
+              options={escolaridadeOptions}
+              className="w-full text-lg"
             />
           </div>
 
-          {/* Patologia */}
-          <div className="flex flex-col ">
-            <label className="text-lg">Patologia</label>
-            <Input
-              name="patologia"
-              placeholder="Patologia"
-              value={formData.patologia}
-              onChange={handleChange} 
-              className="border rounded p-2 md:p-4 w-full text-lg"
-            />
-          </div>
+          {renderField('Patologia', 'patologia', true)}
 
-          {/* Ativo Inativo ou Obito */}
-          <div className='md:col-span-2 my-5'>
           <Button
             type="primary"
-            htmlType="button"
-            onClick={() => setShowModalResponsavel(true)}
+            onClick={() => handleToggleModal('responsavel', true)}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded my-3"
           >
-            Adicionar Responsavel
+            Adicionar Responsável
           </Button>
-            <h1 className='text-2xl md:text-2xl font-bold mb-2 md:mb-4 text-center'>Situação do Usuário</h1>
-            <Radio.Group onChange={handleAtivo} value={ativo} block size='large'>
+
+          <div className="md:col-span-2 my-5">
+            <h1 className="text-2xl font-bold mb-4 text-center">Situação do Usuário</h1>
+            <Radio.Group
+              value={formData.ativo}
+              onChange={e => handleSelectChange('ativo', e.target.value)}
+              className="w-full flex justify-around"
+            >
               <Radio value={0}>Ativo</Radio>
               <Radio value={1}>Inativo</Radio>
-              <Radio value={2}>Obito</Radio>
+              <Radio value={2}>Óbito</Radio>
             </Radio.Group>
           </div>
 
-          {/* Botões */}
           <Button
             type="primary"
-            htmlType="button"
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded hover:bg-yellow-700"
             disabled={!isFormComplete}
           >
-            <Link to={'/adicionar-dados'} className='w-max'>Adicionar Dados</Link>
+            <Link to="/adicionar-dados" className="w-full block">Adicionar Dados</Link>
           </Button>
+
           <Button
             type="primary"
-            htmlType="button"
-            onClick={() => setShowModalEndereco(true)}
+            onClick={() => handleToggleModal('endereco', true)}
             className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
           >
             Adicionar Endereço
@@ -326,30 +222,32 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
         </form>
 
         <EnderecoModal
-          open={showModalEndereco}
-          onClose={() => setShowModalEndereco(false)}
+          open={showModals.endereco}
+          onClose={() => handleToggleModal('endereco', false)}
           onSave={handleEnderecoSubmit}
-          initialData={endereco}
+          initialData={formData.endereco}
         />
+
         <ResponsavelModal
-          open={showModalResponsavel}
-          onClose={() => setShowModalResponsavel(false)}
+          open={showModals.responsavel}
+          onClose={() => handleToggleModal('responsavel', false)}
           onSave={handleResponsavelSubmit}
-          initialData={responsavel}
+          initialData={formData.responsavel}
         />
+
         <Modal
-        title="Voltar à pagina inicial?"
-        open={showModalExit}
-        onOk={backHome}
-        onCancel={() => {setShowModalExit(false)}}
-        okText="Ok"
-        cancelText="Cancelar"
-      >
-        <h1>As alterações não serão salvas! </h1>
-      </Modal>
+          title="Voltar à página inicial?"
+          open={showModals.exit}
+          onOk={() => navigate("/")}
+          onCancel={() => handleToggleModal('exit', false)}
+          okText="Confirmar"
+          cancelText="Cancelar"
+        >
+          <p>Todas as alterações não salvas serão perdidas!</p>
+        </Modal>
       </div>
     </div>
   );
 };
 
-export default CadastroUsuario;
+export default React.memo(CadastroUsuario);
