@@ -87,17 +87,18 @@ const PesquisaUsuario: React.FC = () => {
     if (error) return <Text type="danger">{error}</Text>;
     if (!responseData) return <Text type="secondary">Realize uma pesquisa para exibir resultados</Text>;
     const ativo = ['ATIVO', 'INATIVO', 'OBITO']
-
+  
     return (
-      <div className='md:col-span-2'>
-        <h1 className='text-2xl md:text-2xl font-bold mb-2 md:mb-4 text-center'>Usuários</h1>
+      <div className='w-full'>
+        <h1 className='text-xl lg:text-2xl font-bold mb-2 lg:mb-4 text-center'>Usuários</h1>
         <List
           grid={{
             gutter: 14,
             xs: 1,
             sm: 2,
-            md: 4,
-            lg: 4,
+            md: 3,
+            lg: 3,
+            xl: 4,
           }}
           dataSource={responseData}
           renderItem={(u: UsuarioDTO) => (
@@ -105,19 +106,19 @@ const PesquisaUsuario: React.FC = () => {
               <Card
                 title={u.nome}
                 extra={
-                  <div>
-                    <Button type='text' icon={<EyeOutlined />} onClick={() => {detalhes(u.id)}} className='ml-1' />
-                    <Button type='text' icon={<EditOutlined />} onClick={() => {editarUsuario(u)}}className='ml-1' />
+                  <div className="flex">
+                    <Button type='text' icon={<EyeOutlined />} onClick={() => {detalhes(u.id)}} />
+                    <Button type='text' icon={<EditOutlined />} onClick={() => {editarUsuario(u)}} />
                   </div>
                 }
+                className="w-full"
               >
-                <p>{ativo[u.ativo]}</p>
-                
-                <p>{u.cpf}</p>
-                <p>{u.telefone}</p>
-                <p>{escolaridades[u.escolaridade]}</p>
-                <p>{u.CEP}</p>
-                <p>...</p>
+                <p className="text-sm lg:text-base">{ativo[u.ativo]}</p>
+                <p className="text-sm lg:text-base">{u.cpf}</p>
+                <p className="text-sm lg:text-base">{u.telefone}</p>
+                <p className="text-sm lg:text-base">{escolaridades[u.escolaridade]}</p>
+                <p className="text-sm lg:text-base">{u.CEP}</p>
+                <p className="text-sm lg:text-base">...</p>
               </Card>
             </List.Item>
           )}
@@ -126,15 +127,16 @@ const PesquisaUsuario: React.FC = () => {
     );
   };
 
+
   return (
-    <div className="flex h-screen">
-      {/* Left Sidebar */}
-      <div className="w-1/3 bg-gray-100 p-8 shadow-lg fixed h-full">
-      <div className="flex flex-row justify-between mx-8">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* Left Sidebar - now top section on mobile */}
+      <div className="w-full lg:w-1/3 bg-gray-100 p-4 lg:p-8 lg:shadow-lg lg:fixed lg:h-full">
+        <div className="flex flex-row justify-between mx-2 lg:mx-8">
           <h2></h2>
           <Button icon={<LeftOutlined />} onClick={backHome} className='self-start' />
         </div>
-        <h1 className="text-2xl font-bold mb-6 text-center">Pesquisa de Usuário</h1>
+        <h1 className="text-xl lg:text-2xl font-bold mb-4 lg:mb-6 text-center">Pesquisa de Usuário</h1>
         <div className="space-y-4">
           <div>
             <label className="block text-sm mb-2">Pesquisar</label>
@@ -146,10 +148,15 @@ const PesquisaUsuario: React.FC = () => {
               className="w-full"
             />
             {alertVisible && (
-              <Alert message="No mínimo 3 caracteres! " type="error" closable afterClose={()=>{setAlertVisible(false)}}/>
+              <Alert 
+                message="No mínimo 3 caracteres! " 
+                type="error" 
+                closable 
+                afterClose={() => {setAlertVisible(false)}}
+              />
             )}
           </div>
-
+  
           <div>
             <label className="block text-sm mb-2">Tipo de Pesquisa</label>
             <Select
@@ -163,7 +170,7 @@ const PesquisaUsuario: React.FC = () => {
               <Select.Option value="cep">CEP</Select.Option>
             </Select>
           </div>
-
+  
           <Button
             onClick={handleSearch}
             className="w-full"
@@ -174,9 +181,9 @@ const PesquisaUsuario: React.FC = () => {
           </Button>
         </div>
       </div>
-
-      {/* Right Content */}
-      <div className="ml-[33%] w-2/3 bg-white flex items-start justify-center p-8 overflow-y-auto h-screen">
+  
+      {/* Right Content - now bottom section on mobile */}
+      <div className="w-full lg:w-2/3 lg:ml-[33%] bg-white p-4 lg:p-8 min-h-screen">
         <div className="w-full">{renderResults()}</div>
       </div>
     </div>

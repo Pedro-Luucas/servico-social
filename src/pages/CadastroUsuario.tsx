@@ -136,6 +136,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
       <label className="text-lg">{label}{required && '*'}</label>
       <Input
         name={name}
+        placeholder={label}
         value={formData[name] as string}
         onChange={handleChange}
         className="border rounded p-2 md:p-4 w-full text-lg"
@@ -163,7 +164,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
             <DatePicker
               value={dataNasc}
               onChange={handleDate}
-              className="w-full text-lg"
+              className="border rounded p-2 md:p-4 w-full text-lg"
               popupClassName="date-picker-dropdown"
             />
           </div>
@@ -178,6 +179,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
               onChange={v => handleSelectChange('escolaridade', v)}
               options={escolaridadeOptions}
               className="w-full text-lg"
+             
             />
           </div>
 

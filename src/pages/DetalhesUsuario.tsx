@@ -168,10 +168,12 @@ const DetalhesUsuario = () => {
                       <span className="text-sm text-gray-500">{field.label}</span>
                       <p className="font-medium">
                       {field.key === 'escolaridade'
-                        ? escolaridades[data[field.key]] 
+                        ? escolaridades[data[field.key]]
+                        : field.key === 'dataNasc'
+                        ? new Date(data[field.key]).toLocaleDateString('pt-BR')
                         : typeof data[field.key] === 'boolean'
-                        ? data[field.key] 
-                          ? 'Sim' 
+                        ? data[field.key]
+                          ? 'Sim'
                           : 'Não'
                         : data[field.key] || '-'}
                       </p>

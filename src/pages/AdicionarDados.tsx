@@ -221,6 +221,11 @@ const closeModalSubmit = () => {
   setShowModalSubmit(false);
 };
 
+const handleFormSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  openModalSubmit();
+};
+
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   try {
@@ -255,7 +260,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
         
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Fonte de Renda */}
           <div className="flex flex-col">
@@ -266,12 +271,12 @@ const handleSubmit = async (e: React.FormEvent) => {
               onChange={(value) => handleSelectChange('fonteRenda', value)}
               className="w-full"
               options={[
-                { value: 'emp-formal', label: 'emp. formal' },
-                { value: 'emp-informal', label: 'emp. informal' },
-                { value: 'ap-invalidez', label: 'aposentado por invalidez' },
-                { value: 'ap-contribuicao', label: 'aposentado por tempo de contribuição' },
-                { value: 'pens-morte', label: 'pensão por morte' },
-                { value: 'aux-doenca', label: 'auxilio doença' },
+                { value: 'emprego-formal', label: 'emp. formal' },
+                { value: 'emprego-informal', label: 'emp. informal' },
+                { value: 'aposentado-invalidez', label: 'aposentado por invalidez' },
+                { value: 'aposentado-contribuicao', label: 'aposentado por tempo de contribuição' },
+                { value: 'pensao-morte', label: 'pensão por morte' },
+                { value: 'auxilio-doenca', label: 'auxilio doença' },
                 { value: 'BPC-LOAS', label: 'BPC/LOAS' },
                 { value: 'bolsa-familia', label: 'bolsa familia' },
               ]}
@@ -295,7 +300,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="flex flex-col">
             <label className="text-lg">Tipo de Moradia</label>
             <Select
-              placeholder="Fonte de Renda"
+              placeholder="Moradia"
               onChange={(value) => handleSelectChange('moradia', value)}
               className="w-full"
               value={dados.moradia || undefined} 
@@ -317,8 +322,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               className="w-full"
               value={dados.agua || undefined} 
               options={[
-                { value: 'publica', label: 'rede pública' },
-                { value: 'poco', label: 'poço ou nascente' },
+                { value: 'rede-publica', label: 'rede pública' },
+                { value: 'poco-ou-nascente', label: 'poço ou nascente' },
                 { value: 'outros', label: 'outros' },
               ]}
             />
@@ -477,8 +482,12 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
 
           {/* Botão de Envio */}
-          <Button type="default" htmlType="submit" className="md:col-span-2 bg-blue-600 text-white p-3 md:p-6 w-full text-lg rounded mt-5"
-          disabled={!isFormComplete} onClick={openModalSubmit}>
+          <Button 
+            type="default" 
+            htmlType="submit" 
+            className="md:col-span-2 bg-blue-600 text-white p-3 md:p-6 w-full text-lg rounded mt-5"
+            disabled={!isFormComplete}
+          >
             Enviar Dados
           </Button>
         </form>
