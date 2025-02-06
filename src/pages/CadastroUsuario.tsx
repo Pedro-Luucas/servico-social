@@ -6,7 +6,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { LeftOutlined } from '@ant-design/icons';
 import EnderecoModal from '../components/EnderecoModal';
 import ResponsavelModal from '../components/ResponsavelModal';
-import { Responsavel, User, Endereco } from '../types';
+import { User } from '../types';
 import api from '../service/api';
 
 interface UserFormProps {
@@ -16,45 +16,52 @@ interface UserFormProps {
 
 const initialUserState: User = {
   nome: '',
-  cpf: '',
-  rg: '',
-  data: undefined,
-  telefone: '',
-  profissao: '',
-  escolaridade: 0,
-  endereco: undefined,
-  patologia: '',
-  dados: {
-    fonteRenda: '',
-    valorRenda: 0,
-    moradia: '',
-    agua: '',
-    energia: '',
-    bens: '',
-    internet: false,
-    CRAS: false,
-    acessoCRAS: false,
-    chaveCRAS: '',
-    senhaCRAS: '',
-    descDoenca: '',
-    medicamentos: '',
-    medicamentosGasto: 0,
-    tratamento: '',
-    nutri: false,
-    tempoTratamento: '',
-    local: '',
-    encaminhamento: ''
-  },
-  responsavel: {
-    nome: '',
-    cpf: '',
-    idade: 0,
-    telefone: '',
-    profissao: '',
-    escolaridade: 0,
-    parentesco: '',
-  },
   ativo: 1,
+  cpf: '',
+  rg: null,
+  dataNasc: '',
+  telefone: '',
+  profissao: null,
+  escolaridade: 0,
+  patologia: '',
+  cep: '',
+  municipio: '',
+  bairro: '',
+  rua: '',
+  numero: '',
+  referencia: null,
+  respNome: null,
+
+  respCpf: null,
+  respIdade: null,
+  respTelefone: null,
+  respProfissao: null,
+  respEscolaridade: null,
+  respParentesco: null,
+  respRenda: null,
+  fonteRenda: '',
+  valorRenda: 0,
+  moradia: '',
+  agua: '',
+  aguaValor: '',
+  energia: '',
+  energiaValor: '',
+  bens: '',
+  internet: false,
+  cras: false,
+  acessoCRAS: '',
+  descDoenca: '',
+  medicamentos: '',
+  medicamentosGasto: 0,
+  tratamento: '',
+
+  nutri: '',
+  tempoTratamento: '',
+  local: '',
+  encaminhamento: '',
+  solicitacoes: '',
+  motivoDesligamento: '',
+  parecerSocial: ''
 };
 
 const escolaridadeOptions = [
@@ -84,7 +91,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   });
 
   const [dataNasc, setDataNasc] = useState<Dayjs | undefined>(
-    formData.data ? dayjs(formData.data) : undefined
+    formData.dataNasc ? dayjs(formData.dataNasc) : undefined
   );
 
   const handleToggleModal = useCallback((modal: keyof typeof showModals, value: boolean) => {
@@ -98,13 +105,14 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   const isFormComplete = Boolean(
     formData.nome.trim() &&
     formData.cpf.trim() &&
-    formData.data &&
+    formData.dataNasc &&
     formData.telefone.trim() &&
     formData.escolaridade !== undefined &&
     formData.patologia.trim() &&
-    formData.endereco?.CEP?.trim() &&
-    formData.responsavel.nome.trim()
+    formData.cep?.trim() &&
+    formData.respNome?.trim()
   );
+
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -114,20 +122,55 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
   const handleDate = useCallback((date: Dayjs | null) => {
     if (!date) return;
     setDataNasc(date);
-    setFormData(prev => ({ ...prev, data: date.toISOString() }));
+    setFormData(prev => ({ ...prev, dataNasc: date.toISOString() }));
   }, []);
 
   const handleSelectChange = useCallback((name: keyof User, value: unknown) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleEnderecoSubmit = useCallback((enderecoData: Endereco) => {
-    setFormData(prev => ({ ...prev, endereco: enderecoData }));
+  const handleEnderecoSubmit = useCallback((enderecoData: {
+    cep: string;
+    municipio: string;
+    bairro: string;
+    rua: string;
+    numero: string;
+    referencia: string | null;
+
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      cep: enderecoData.cep,
+      municipio: enderecoData.municipio,
+      bairro: enderecoData.bairro,
+      rua: enderecoData.rua,
+      numero: enderecoData.numero,
+      referencia: enderecoData.referencia
+    }));
     handleToggleModal('endereco', false);
   }, [handleToggleModal]);
 
-  const handleResponsavelSubmit = useCallback((responsavelData: Responsavel) => {
-    setFormData(prev => ({ ...prev, responsavel: responsavelData }));
+  const handleResponsavelSubmit = useCallback((responsavelData: {
+    nome: string | null;
+    cpf: string | null;
+    idade: number | null;
+    telefone: string | null;
+    profissao: string | null;
+    escolaridade: number | null;
+    parentesco: string | null;
+    renda: string | null;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      respNome: responsavelData.nome,
+      respCpf: responsavelData.cpf,
+      respIdade: responsavelData.idade,
+      respTelefone: responsavelData.telefone,
+      respProfissao: responsavelData.profissao,
+      respEscolaridade: responsavelData.escolaridade,
+      respParentesco: responsavelData.parentesco,
+      respRenda: responsavelData.renda
+    }));
     handleToggleModal('responsavel', false);
   }, [handleToggleModal]);
 
@@ -227,14 +270,31 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           open={showModals.endereco}
           onClose={() => handleToggleModal('endereco', false)}
           onSave={handleEnderecoSubmit}
-          initialData={formData.endereco}
+          initialData={{
+            cep: formData.cep,
+            municipio: formData.municipio,
+            bairro: formData.bairro,
+            rua: formData.rua,
+            numero: formData.numero,
+            referencia: formData.referencia
+
+          }}
         />
 
         <ResponsavelModal
           open={showModals.responsavel}
           onClose={() => handleToggleModal('responsavel', false)}
           onSave={handleResponsavelSubmit}
-          initialData={formData.responsavel}
+          initialData={{
+            nome: formData.respNome,
+            cpf: formData.respCpf,
+            idade: formData.respIdade,
+            telefone: formData.respTelefone,
+            profissao: formData.respProfissao,
+            escolaridade: formData.respEscolaridade,
+            parentesco: formData.respParentesco,
+            renda: formData.respRenda
+          }}
         />
 
         <Modal

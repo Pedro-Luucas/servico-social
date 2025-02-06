@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Input, Select, Card, Typography, List, Alert, Modal } from 'antd';
 import { pesquisar } from '../service/pesquisar';
-import { escolaridades, User, UsuarioDTO } from '../types';
+import { escolaridades, User } from '../types';
 import { EditOutlined, EyeOutlined, LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { transformFrontToDTO, transformDTOToFront } from '../components/transformUser'
 
 const { Text } = Typography;
 
@@ -66,18 +65,10 @@ const PesquisaUsuario: React.FC = () => {
     }
   }
   
-  const editarUsuario = (userBack: UsuarioDTO) => {
-    if(userBack){
+  const editarUsuario = (user: User) => {
+    if(user) {
       sessionStorage.setItem('edit', 'true')
-      const userFront = transformDTOToFront(userBack)
-      sessionStorage.setItem('formData', JSON.stringify(userFront))
-
-      console.log('USUARIO DA FUNCAO: ',userBack)
-      const usu = sessionStorage.getItem('formData')
-      if(usu){
-        console.log('USUARIO NO FORMDATA: ',JSON.parse(usu))
-      }
-
+      sessionStorage.setItem('formData', JSON.stringify(user))
       navigate('/cadastro-usuario')
     }
   }
@@ -101,10 +92,11 @@ const PesquisaUsuario: React.FC = () => {
             xl: 4,
           }}
           dataSource={responseData}
-          renderItem={(u: UsuarioDTO) => (
+          renderItem={(u: User) => (
             <List.Item>
               <Card
                 title={u.nome}
+
                 extra={
                   <div className="flex">
                     <Button type='text' icon={<EyeOutlined />} onClick={() => {detalhes(u.id)}} />
@@ -117,7 +109,7 @@ const PesquisaUsuario: React.FC = () => {
                 <p className="text-sm lg:text-base">{u.cpf}</p>
                 <p className="text-sm lg:text-base">{u.telefone}</p>
                 <p className="text-sm lg:text-base">{escolaridades[u.escolaridade]}</p>
-                <p className="text-sm lg:text-base">{u.CEP}</p>
+                <p className="text-sm lg:text-base">{u.cep}</p>
                 <p className="text-sm lg:text-base">...</p>
               </Card>
             </List.Item>

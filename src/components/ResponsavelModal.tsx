@@ -1,12 +1,29 @@
 import React from 'react';
 import { Modal, Form, Input, InputNumber, Select } from 'antd';
-import { Responsavel } from '../types';
 
 interface ResponsavelModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (responsavel: Responsavel) => void;
-  initialData?: Responsavel;
+  onSave: (responsavel: {
+    nome: string | null;
+    cpf: string | null;
+    idade: number | null;
+    telefone: string | null;
+    profissao: string | null;
+    escolaridade: number | null;
+    parentesco: string | null;
+    renda: string | null;
+  }) => void;
+  initialData?: {
+    nome: string | null;
+    cpf: string | null;
+    idade: number | null;
+    telefone: string | null;
+    profissao: string | null;
+    escolaridade: number | null;
+    parentesco: string | null;
+    renda: string | null;
+  };
 }
 
 const ResponsavelModal: React.FC<ResponsavelModalProps> = ({
@@ -63,7 +80,6 @@ const ResponsavelModal: React.FC<ResponsavelModalProps> = ({
           name="cpf"
           label="CPF"
           rules={[
-            { required: true, message: 'Por favor, insira o CPF' },
             { pattern: /^\d{11}$/, message: 'CPF deve conter 11 dígitos' }
           ]}
         >
@@ -74,7 +90,6 @@ const ResponsavelModal: React.FC<ResponsavelModalProps> = ({
           <Form.Item
             name="idade"
             label="Idade"
-            rules={[{ required: true, message: 'Por favor, insira a idade' }]}
           >
             <InputNumber
               min={0}
@@ -88,7 +103,6 @@ const ResponsavelModal: React.FC<ResponsavelModalProps> = ({
             name="telefone"
             label="Telefone"
             rules={[
-              { required: true, message: 'Por favor, insira o telefone' },
               { pattern: /^\d{10,11}$/, message: 'Telefone inválido' }
             ]}
           >

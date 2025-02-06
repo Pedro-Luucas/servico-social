@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal, Form, Input, message } from 'antd';
-import { Endereco } from '../types';
 import axios from 'axios';
 import MaskedInput from 'antd-mask-input';
 
@@ -9,8 +8,23 @@ const { TextArea } = Input;
 interface EnderecoModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (endereco: Endereco) => void;
-  initialData?: Endereco;
+  onSave: (endereco: {
+    cep: string;
+    municipio: string;
+    bairro: string;
+    rua: string;
+    numero: string;
+    referencia: string | null;
+  }) => void;
+
+  initialData?: {
+    cep: string;
+    municipio: string;
+    bairro: string;
+    rua: string;
+    numero: string;
+    referencia: string | null;
+  };
 }
 
 const EnderecoModal: React.FC<EnderecoModalProps> = ({
@@ -58,10 +72,11 @@ const EnderecoModal: React.FC<EnderecoModalProps> = ({
       const values = await form.validateFields();
       onSave({
         ...values,
-        CEP: values.CEP.replace(/[^0-9]/g, "")
+        cep: values.cep.replace(/[^0-9]/g, "")
       });
       form.resetFields();
       onClose();
+
     } catch (error) {
       console.error('Validation failed:', error);
     }
@@ -88,8 +103,8 @@ const EnderecoModal: React.FC<EnderecoModalProps> = ({
         initialValues={initialData}
         autoComplete="off"
       >
-        <Form.Item
-          name="CEP"
+          <Form.Item
+          name="cep"
           label="CEP"
           rules={[
             { required: true, message: 'Por favor, insira o CEP' }
