@@ -11,6 +11,8 @@ import DetalhesUsuario from './pages/DetalhesUsuario';
 import axios from 'axios';
 import api from './service/api';
 import CadastrarNovoOperador from './pages/CadastrarNovoOperador';
+import ParecerSocial from './pages/ParecerSocial';
+import RegistrosAtendimento from './pages/RegistrosAtendimento';
 
 const router = createBrowserRouter([
   {
@@ -23,7 +25,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/cadastro-usuario',
-    element: <CadastroUsuario onSubmit={() => {}} />,
+    element: <CadastroUsuario onSubmit={() => {}} />
   },
   {
     path: '/adicionar-dados',
@@ -36,6 +38,14 @@ const router = createBrowserRouter([
   {
     path: '/cadastrarnovooperador',
     element: <CadastrarNovoOperador />,
+  },
+  {
+    path: '/parecer-social',
+    element: <ParecerSocial />,
+  },
+  {
+    path: '/registro-atendimento/:id',
+    element: <RegistrosAtendimento />,
   },
 ]);
 

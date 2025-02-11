@@ -231,9 +231,25 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
           <Button
             type="primary"
             onClick={() => handleToggleModal('responsavel', true)}
-            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded my-3"
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
           >
             Adicionar Responsável
+          </Button>
+
+          <Button
+            type="primary"
+            onClick={() => handleToggleModal('endereco', true)}
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
+          >
+            Adicionar Endereço
+          </Button>
+
+          <Button
+            type="primary"
+            onClick={() => {navigate('/parecer-social')}}
+            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
+          >
+            Adicionar Parecer Social
           </Button>
 
           <div className="md:col-span-2 my-5">
@@ -257,13 +273,7 @@ const CadastroUsuario: React.FC<UserFormProps> = ({ onSubmit, initialData }) => 
             <Link to="/adicionar-dados" className="w-full block">Adicionar Dados</Link>
           </Button>
 
-          <Button
-            type="primary"
-            onClick={() => handleToggleModal('endereco', true)}
-            className="md:col-span-2 bg-blue-500 text-white p-2 md:p-4 w-full text-lg rounded"
-          >
-            Adicionar Endereço
-          </Button>
+          
         </form>
 
         <EnderecoModal
