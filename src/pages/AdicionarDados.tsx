@@ -154,6 +154,16 @@ const AdicionarDados: React.FC = () => {
     })
   );
 
+// Add this useEffect to check treatment checkboxes
+  useEffect(() => {
+    if (dados?.tratamento) {
+      const selectedTratamentos = dados.tratamento.split(', ');
+      tratamentos.forEach((tratamento, index) => {
+        tratamentoCheckboxes[index].setChecked(selectedTratamentos.includes(tratamento));
+      });
+    }
+  }, [dados?.tratamento]);
+
   var SNnet = isNet ? 'Sim' : 'Não'
   var SNCRAS = isCRAS ? 'Sim' : 'Não'
 
