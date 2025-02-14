@@ -13,6 +13,7 @@ import api from './service/api';
 import CadastrarNovoOperador from './pages/CadastrarNovoOperador';
 import ParecerSocial from './pages/ParecerSocial';
 import RegistrosAtendimento from './pages/RegistrosAtendimento';
+import Documentos from './pages/Documentos';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
   {
     path: '/registro-atendimento/:id',
     element: <RegistrosAtendimento />,
+  },
+  {
+    path: '/documentos/:id',
+    element: <Documentos />,
   },
 ]);
 

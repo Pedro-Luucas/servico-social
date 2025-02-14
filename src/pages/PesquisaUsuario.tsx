@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Input, Select, Card, Typography, List, Alert, Modal } from 'antd';
 import { pesquisar } from '../service/pesquisar';
 import { escolaridades, User } from '../types';
-import { DiffOutlined, EditOutlined, EyeOutlined, LeftOutlined } from '@ant-design/icons';
+import { DiffOutlined, EditOutlined, EyeOutlined, FilePdfOutlined, LeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Text } = Typography;
@@ -76,8 +76,14 @@ const PesquisaUsuario: React.FC = () => {
   const adicionarRegistroAtendimento = (id: string | undefined) => {
     if(id) {
       navigate('/registro-atendimento/'+id)
+    }
   }
-}
+
+  const anexarDocumentos = (id: string | undefined) => {
+    if(id) {
+      navigate('/documentos/'+id)
+    }
+  }
 
   const renderResults = () => {
     if (loading) return <Text type="secondary">Carregando...</Text>;
@@ -108,6 +114,7 @@ const PesquisaUsuario: React.FC = () => {
                     <Button type='text' icon={<EyeOutlined />} onClick={() => {detalhes(u.id)}} />
                     <Button type='text' icon={<EditOutlined />} onClick={() => {editarUsuario(u)}} />
                     <Button type='text' icon={<DiffOutlined />} onClick={() => {adicionarRegistroAtendimento(u.id)}} />
+                    <Button type='text' icon={<FilePdfOutlined />} onClick={() => {anexarDocumentos(u.id)}} />
                   </div>
                 }
                 className="w-full"
